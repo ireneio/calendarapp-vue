@@ -18,8 +18,8 @@ export default {
         // minus 30 mins because UI starts at the 'next' block
         // e.g. event starts @ 8:00, UI starts showing at the 8:30 block
         if (
-          timeBlockReformat - 30 === startTimeReformat ||
-          timeBlockReformat - 70 === startTimeReformat
+          timeBlockReformat - 15 === startTimeReformat ||
+          timeBlockReformat - 55 === startTimeReformat
         ) {
           start = true
         }

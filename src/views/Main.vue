@@ -6,8 +6,9 @@
     >
       <div class="row">
         <div class="col-24">
-          <div class="d-flex align-items-center mt-3">
-            <h5 v-show="$route.path.includes('week')">預約行事曆</h5>
+          <div class="d-flex align-items-center mt-2">
+            <img class="mb-0 mr-2" src="../assets/logo_mobile.png" alt="logo" style="{ width: 48px; height: 48px; object-fit: contain; vertical-align: middle; }">
+            <h5 v-show="$route.path.includes('week')" class="mt-2">預約 {{ brand }}</h5>
             <div
               v-show="$route.path.includes('day')"
               class="align-items-center mr-2"
@@ -26,21 +27,21 @@
               class="ml-auto btn btn-secondary text-primary rounded-pill"
               @click="$router.push({ name: $route.path.includes('week') ? 'day' : 'week' })"
             >
-              {{ $route.path.includes('week') ?'週檢視' : '日檢視' }}
+              {{ $route.path.includes('week') ? '週檢視' : '日檢視' }}
               <fa icon="caret-down"></fa>
             </a>
 
             <div class="dropdown">
               <a
-                class="ml-2 btn btn-secondary text-primary rounded-pill"
+                class="ml-2 btn btn-outlined text-primary rounded-pill"
                 href="javascript:;"
                 role="button"
                 id="dropdownMenuLink"
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
-              >{{ displayName[0] }}</a>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              >{{ displayName }}</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="margin-top: 12px;">
                 <a class="dropdown-item" href="#" @click="handleLogout">登出</a>
               </div>
             </div>
@@ -75,19 +76,27 @@
       :timeline="timeline"
       :week="filterEventsToCurrentWeek()"
       :events="filterEventsToCurrentDay()"
+      @selected-block="handleWeekBlockSelect($event)"
     ></router-view>
     <div
-      class="container-xl position-fixed bg-white shadow-sm"
-      style="bottom:0; left:50%; transform:translateX(-50%);"
+      class="container-xl position-fixed bg-white shadow-lg"
+      style="{ transition: transform .66s; }"
+      :style="{ bottom: 0, left: '50%', transform: showFooter ? 'translate(-50%, 0%)' : 'translate(-50%, 100%)' }"
     >
+      <span
+        class="position-absolute h3 text-decoration-none text-dark"
+        style="{ top: 12px; right: 12px; z-index: 2; cursor: pointer; }"
+        @click.stop="() => showFooter = false"
+      >&times;</span>
       <div class="row">
         <div class="col-24 text-center py-3">
           <button
             type="button"
-            class="btn btn-primary"
+            class="btn btn-link"
             data-target="#addEventModal"
             data-toggle="modal"
-          >新增預約</button>
+            :disabled="!!selectedBlock?.isBooked"
+          >{{ selectedBlock?.isBooked ? '此時段已被預約' : '新增預約' }}</button>
         </div>
       </div>
     </div>
@@ -100,7 +109,7 @@
       aria-hidden="true"
     >
       <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="{ transform: translateY(100px); }">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">新增預約</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -152,20 +161,22 @@
                   v-model="form.startTime"
                 >
                   <option value>選擇開始的時間</option>
-                  <option v-for="time in timeline" :key="time" :value="time">{{time}}</option>
+                  <option v-for="time in timelineMapStartTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value">{{ time?.value }}</option>
                 </select>
               </div>
               <div class="form-group col-12">
                 <label for="exampleFormControlSelect2">結束時間</label>
-                <select class="form-control" id="exampleFormControlSelect2" v-model="form.endTime">
+                <select class="form-control" id="exampleFormControlSelect2" v-model="form.endTime" :disabled="disableEndTimeSelect">
                   <option value>選擇結束的時間</option>
-                  <option v-for="time in timeline" :key="time" :value="time">{{time}}</option>
+                  <option v-for="time in timelineMapEndTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value">{{ time?.value }}</option>
                 </select>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="() => {
+              clearForm()
+            }">取消</button>
             <button
               type="button"
               class="btn btn-primary"
@@ -181,16 +192,16 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions, mapState } from 'vuex'
+import axios from 'axios'
+import dayjs from 'dayjs'
+import _ from 'lodash'
 import weeksData from '@/mixins/weeksData'
 import checkDateIsToday from '@/mixins/checkDateIsToday'
 import reformatTime from '@/mixins/reformatTime'
-import axios from 'axios'
+import { sleep } from '@/utils/general'
+
 export default {
   mixins: [weeksData, checkDateIsToday, reformatTime],
-  computed: {
-    ...mapGetters(['getNowWeek']),
-    ...mapState(['events', 'displayName'])
-  },
   data() {
     return {
       timeline: [],
@@ -200,19 +211,78 @@ export default {
         endTime: '',
         date: ''
       },
-      alerts: []
+      alerts: [],
+      brand: process.env.VUE_APP_BRAND,
+      selectedBlock: null,
+      showFooter: false
+    }
+  },
+  computed: {
+    ...mapGetters(['getNowWeek']),
+    ...mapState(['events', 'displayName']),
+    timelineMapStartTime() {
+      const events = this.filterEventsToCurrentWeek()
+      const hasEvent = (date, timelineTime) => {
+        const targetDayEvents = events.filter((event) => dayjs(`${event.year}-${event.month}-${event.day}`).isSame(dayjs(date)))
+        if (targetDayEvents.length) {
+          const events = _.flatten(targetDayEvents[0].events)
+          const thisDate = dayjs(`${date} ${timelineTime}`)
+          return events.filter((event) => {
+            const st = dayjs(`${date} ${event?.startTime}`)
+            const et = dayjs(`${date} ${event?.endTime}`)
+            return (st.isSame(thisDate) || st.isBefore(thisDate)) && et.isAfter(thisDate)
+          }).length > 0
+        }
+        return false
+      }
+      return this.timeline.map((timelineTime) => {
+        return {
+          value: timelineTime,
+          disabled: hasEvent(this.form.date, timelineTime)
+        }
+      })
+    },
+    timelineMapEndTime() {
+      // return this.timeline.map((v) => {
+      //   const st = dayjs(`${this.form.date} ${this.form.startTime}`)
+      //   return {
+      //     value: v,
+      //     disabled: this.form.startTime ? st.isAfter(dayjs(`${this.form.date} ${v}`)) || st.isSame(dayjs(`${this.form.date} ${v}`)) : false
+      //   }
+      // })
+      return this.timeline.map((v) => ({ value: v, disabled: true }))
+    },
+    disableEndTimeSelect() {
+      return true
+    }
+  },
+  watch: {
+    'form.startTime'(v) {
+      this.form.endTime = dayjs(`${this.form.date} ${this.form.startTime}`).add(15, 'minutes').format('HH:mm')
     }
   },
   methods: {
     ...mapMutations(['setNowDate']),
     ...mapActions(['GET_events', 'UPDATE_events', 'updateLoginStatus']),
+    async clearForm() {
+      await sleep(600)
+      // this.form.date = dayjs().format('YYYY-MM-DD')
+      // this.form.startTime = this.timeline[0]
+      // this.form.endTime = this.timeline[1]
+      this.form.content = `[${this.displayName}]: 我要預約諮詢.`
+      this.alerts = []
+    },
     // make timeline blocks (every 30 mins)
     makeTimeline() {
-      for (let i = 6; i < 24; i += 0.5) {
+      const startHour = !isNaN(Number(process.env.VUE_APP_BOOK_START_TIME)) ? Number(process.env.VUE_APP_BOOK_START_TIME) : 10
+      const endHour = !isNaN(Number(process.env.VUE_APP_BOOK_END_TIME)) ? Number(process.env.VUE_APP_BOOK_END_TIME) : 21.5
+      for (let i = startHour; i < endHour + 0.5; i += 0.25) {
         const hour = parseInt(i).toString()
-        const min = i % 1 === 0 ? '00' : '30'
-        const zone = parseInt(i) < 12 ? 'am' : 'pm'
-        const str = hour + ':' + min + zone
+        const minStr = String(i)
+        const min = minStr.includes('.25') ? '15' : minStr.includes('.5') ? '30' : minStr.includes('.75') ? '45' : '00'
+        // const zone = parseInt(i) < 12 ? 'am' : 'pm'
+        // const str = hour + ':' + min + zone
+        const str = hour + ':' + min
         this.timeline = [...this.timeline, str]
       }
     },
@@ -256,23 +326,31 @@ export default {
         if (this.alerts.indexOf('開始時間不得晚於結束時間') === -1) this.alerts.push('開始時間不得晚於結束時間')
         return false
       }
-      const events = this.events
+      // const events = this.events
+      // let isBlockBooked = false
       // check if block is already booked
-      if (events.length) {
-        events.find(event => {
-          const formDate = new Date(this.form.date)
-          const eventDate = new Date(event.date)
-          if (formDate.getFullYear() === eventDate.getFullYear() && formDate.getMonth() === eventDate.getMonth && formDate.getDate() === eventDate.getDate()) {
-            if (this.reformatTime(event.startTime) <= startTime || this.reformatTime(event.endTime) >= endTime || this.reformatTime(event.endTime) > startTime) {
-              if (this.alerts.indexOf('這個時段已經有預約') === -1) this.alerts.push('這個時段已經有預約')
-              return false
-            }
-          }
-        })
-      }
-      await this.UPDATE_events(this.form)
-      this.form = { content: '', startTime: '', endTime: '', date: '' }
-      this.filterEventsToCurrentWeek()
+      // if (events.length) {
+      //   events.find(event => {
+      //     const formDate = new Date(this.form.date)
+      //     const eventDate = new Date(event.date)
+      //     if (formDate.getFullYear() === eventDate.getFullYear() && formDate.getMonth() === eventDate.getMonth() && formDate.getDate() === eventDate.getDate()) {
+      //       if (this.reformatTime(event.startTime) <= startTime || this.reformatTime(event.endTime) >= endTime || this.reformatTime(event.endTime) > startTime) {
+      //         if (this.alerts.indexOf('這個時段已經有預約') === -1) this.alerts.push('這個時段已經有預約')
+      //         isBlockBooked = true
+      //         return false
+      //       }
+      //     }
+      //   })
+      // }
+      // if (isBlockBooked) {
+      //   return false
+      // } else {
+      //   await this.UPDATE_events(this.form)
+      //   this.clearForm()
+      //   // this.filterEventsToCurrentWeek()
+      // }
+      await this.UPDATE_events({ ...this.form })
+      this.clearForm()
     },
     // change current day with a specific date
     selectDay(date) {
@@ -317,11 +395,21 @@ export default {
           this.updateLoginStatus({ status: false, accessToken: '', userId: null, displayName: null })
           this.$router.push({ name: 'Home' })
         })
+    },
+    async handleWeekBlockSelect(block) {
+      console.log('block', block)
+      this.selectedBlock = { ...block }
+      this.form.date = dayjs(`${block?.year}/${block?.month}/${block?.day}`).format('YYYY-MM-DD')
+      this.form.startTime = dayjs(`${block?.year}/${block?.month}/${block?.day} ${block?.time}`).subtract(15, 'minutes').format('HH:mm')
+      await sleep(600)
+      this.showFooter = true
     }
   },
-  created() {
+  async created() {
     this.makeTimeline()
-    this.getEvents()
+    this.getEvents().then(() => {
+      this.clearForm()
+    })
   },
   beforeDestroy() {
     // force calender to render current month at top
