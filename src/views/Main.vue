@@ -172,15 +172,15 @@
                   class="form-control"
                   id="exampleFormControlSelect1"
                   v-model="form.startTime"
-                  :readonly="isFormReadOnly"
+                  :disabled="isFormReadOnly"
                 >
                   <option value>選擇開始的時間</option>
-                  <option v-for="time in timelineMapStartTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value" :readonly="isFormReadOnly">{{ time?.value }}</option>
+                  <option v-for="time in timelineMapStartTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value">{{ time?.value }}</option>
                 </select>
               </div>
               <div class="form-group col-12">
                 <label for="exampleFormControlSelect2">結束時間</label>
-                <select class="form-control" id="exampleFormControlSelect2" v-model="form.endTime" :disabled="disableEndTimeSelect" :readonly="isFormReadOnly">
+                <select class="form-control" id="exampleFormControlSelect2" v-model="form.endTime" :disabled="disableEndTimeSelect || isFormReadOnly">
                   <option value>選擇結束的時間</option>
                   <option v-for="time in timelineMapEndTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value">{{ time?.value }}</option>
                 </select>
@@ -438,8 +438,13 @@ export default {
       this.form.startTime = block?.startTime
       this.form.endTime = block?.endTime
       this.form.content = block?.content
-      await sleep(600)
-      this.showFooter = true
+      if (block?.isBooked) {
+        this.isFormReadOnly = true
+      } else {
+        this.isFormReadOnly = false
+        await sleep(600)
+        this.showFooter = true
+      }
     }
   },
   async created() {
