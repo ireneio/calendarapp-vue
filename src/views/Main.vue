@@ -1,75 +1,80 @@
 <template>
-  <div>
+  <div class="position-relative">
     <div
-      class="container-xl shadow-sm bg-white position-fixed"
-      style="top:0; left:50%; transform:translateX(-50%); z-index:1000;"
+      class="position-fixed"
+      style="top: 0; left: 0; z-index: 1000; width: 100vw;"
     >
-      <div class="row">
-        <div class="col-24">
-          <div class="d-flex align-items-center mt-2">
-            <img class="mb-0 mr-2" src="../assets/logo_mobile.png" alt="logo" style="{ width: 48px; height: 48px; object-fit: contain; vertical-align: middle; }">
-            <h5 v-show="$route.path.includes('week')" class="mt-2">預約 {{ brand }}</h5>
-            <div
-              v-show="$route.path.includes('day')"
-              class="align-items-center mr-2"
-              :class="{ 'd-flex': $route.path.includes('day')}"
-            >
-              <a href="javascript:;" class="text-dark btn" @click="adjustDay(-1)">
-                <fa icon="arrow-alt-circle-left"></fa>
-              </a>
-              <span>{{ getNowYear + ' / ' + getNowMonth + ' / ' + getNowDay}}</span>
-              <a href="javascript:;" class="text-dark btn" @click="adjustDay(1)">
-                <fa icon="arrow-alt-circle-right"></fa>
-              </a>
-            </div>
-            <a
-              href="javascript:;"
-              class="ml-auto btn btn-secondary text-primary rounded-pill"
-              @click="$router.push({ name: $route.path.includes('week') ? 'day' : 'week' })"
-            >
-              {{ $route.path.includes('week') ? '週檢視' : '日檢視' }}
-              <fa icon="caret-down"></fa>
-            </a>
-
-            <div class="dropdown">
+      <div class="container-xl shadow-sm bg-white">
+        <div class="row">
+          <div class="col-24">
+            <div class="d-flex align-items-center mt-2">
+              <img class="mb-0 mr-2" src="../assets/logo_mobile.png" alt="logo" style="{ width: 48px; height: 48px; object-fit: contain; vertical-align: middle; }">
+              <!-- <h5 v-show="$route.path.includes('week')" class="mt-2">預約 {{ brand }}</h5> -->
+              <!-- <div v-show="$route.path.includes('week')" class="d-flex align-items-center mr-2">
+                <div v-show="$route.path.includes('week')" class="mt-0">{{ getNowYear + ' / ' + getNowMonth }}</div>
+              </div> -->
+              <!-- v-show="$route.path.includes('day')" -->
+              <div
+                class="d-flex align-items-center mr-2"
+                >
+                <!-- :class="{ 'd-flex': $route.path.includes('day')}" -->
+                <a href="javascript:;" class="text-dark btn" @click="adjustDay($route.path.includes('day') ? -1 : -7)">
+                  <fa icon="arrow-alt-circle-left"></fa>
+                </a>
+                <div>{{ getNowYear + ' / ' + getNowMonth }}</div>
+                <a href="javascript:;" class="text-dark btn" @click="adjustDay($route.path.includes('day') ? 1 : 7)">
+                  <fa icon="arrow-alt-circle-right"></fa>
+                </a>
+              </div>
               <a
-                class="ml-2 btn btn-outlined text-primary rounded-pill"
                 href="javascript:;"
-                role="button"
-                id="dropdownMenuLink"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >{{ displayName }}</a>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="margin-top: 12px;">
-                <a class="dropdown-item" href="#" @click="handleLogout">登出</a>
+                class="ml-auto btn btn-secondary text-primary rounded-pill"
+                @click="$router.push({ name: $route.path.includes('week') ? 'day' : 'week' })"
+              >
+                {{ $route.path.includes('week') ? '週檢視' : '日檢視' }}
+                <fa icon="caret-down"></fa>
+              </a>
+
+              <div class="dropdown">
+                <a
+                  class="ml-2 btn btn-outlined text-primary rounded-pill"
+                  href="javascript:;"
+                  role="button"
+                  id="dropdownMenuLink"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >{{ displayName }}</a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="margin-top: 12px;">
+                  <a class="dropdown-item" href="#" @click="handleLogout">登出</a>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="row py-2">
-        <div class="col-3 text-center d-flex align-items-center justify-content-center">
+        <div class="row py-2">
+          <div class="col-3 text-center d-flex align-items-center justify-content-center">
+            <button
+              class="bg-secondary text-primary rounded-circle btn"
+              style="font-size: 16px; transform:translateY(5px);"
+              @click="$router.push({ name: 'calendar'})"
+            >
+              <fa :icon="['far', 'calendar']"></fa>
+            </button>
+          </div>
           <button
-            class="bg-secondary text-primary rounded-circle btn"
-            style="font-size: 16px; transform:translateY(5px);"
-            @click="$router.push({ name: 'calendar'})"
+            class="col-3 d-flex flex-column align-items-center btn"
+            v-for="(day,index) of getNowWeek"
+            :key="day.day"
+            :class="{ 'bg-primary rounded': isToday(day) && $route.path.includes('day')}"
+            @click="selectDay(day)"
           >
-            <fa :icon="['far', 'calendar']"></fa>
+            <span
+              :class="{'text-light': isToday(day) && $route.path.includes('day')}"
+            >{{ weeks[index].n}}</span>
+            <span :class="{'text-light': isToday(day) && $route.path.includes('day')}">{{ day.day }}</span>
           </button>
         </div>
-        <button
-          class="col-3 d-flex flex-column align-items-center btn"
-          v-for="(day,index) of getNowWeek"
-          :key="day.day"
-          :class="{ 'bg-primary rounded': isToday(day) && $route.path.includes('day')}"
-          @click="selectDay(day)"
-        >
-          <span
-            :class="{'text-light': isToday(day) && $route.path.includes('day')}"
-          >{{ weeks[index].n}}</span>
-          <span :class="{'text-light': isToday(day) && $route.path.includes('day')}">{{ day.day }}</span>
-        </button>
       </div>
     </div>
     <router-view
@@ -88,6 +93,11 @@
         style="{ top: 12px; right: 12px; z-index: 2; cursor: pointer; }"
         @click.stop="() => showFooter = false"
       >&times;</span>
+      <span
+        class="position-absolute text-dark"
+        style="{ top: 0; left: 12px; z-index: 2; transform: translateY(8px); text-decoration: none; cursor: pointer; font-size: 12px; }"
+        @click="adjustDay('now')"
+      >回到當日</span>
       <div class="row">
         <div class="col-24 text-center py-3">
           <button
@@ -358,25 +368,32 @@ export default {
       const { day, month, year } = date
       this.setNowDate(`${year}-${month}-${day}`)
     },
-    // change current day by -1/+1
+    // change current day by [val]
     adjustDay(val) {
-      if ((this.getNowDay === this.countDaysInMonth(this.getNowYear, this.getNowMonth) && val === 1) || (this.getNowDay === 1 && val === -1)) {
-        if (val === 1) {
-          if (this.getNowMonth === 12 && this.getNowDay === 31) {
-            this.setNowDate(`${this.getNowYear + 1}-${1}-${1}`)
-          } else {
-            this.setNowDate(`${this.getNowYear}-${this.getNowMonth + 1}-${1}`)
-          }
-        } else {
-          if (this.getNowMonth === 1 && this.getNowDay === 1) {
-            this.setNowDate(`${this.getNowYear - 1}-${12}-${31}`)
-          } else {
-            this.setNowDate(`${this.getNowYear}-${this.getNowMonth - 1}-${this.countDaysInMonth(this.getNowYear, this.getNowMonth - 1)}`)
-          }
-        }
-      } else {
-        this.setNowDate(`${this.getNowYear}-${this.getNowMonth}-${this.getNowDay + val}`)
+      if (val === 'now') {
+        this.setNowDate(dayjs().format('YYYY-MM-DD'))
+        return
       }
+      const target = dayjs(`${this.getNowYear}-${this.getNowMonth}-${this.getNowDay}`)
+      const add = target.add(val, 'days')
+      this.setNowDate(add.format('YYYY-MM-DD'))
+      // if ((this.getNowDay === this.countDaysInMonth(this.getNowYear, this.getNowMonth) && val === 1) || (this.getNowDay === 1 && val === -1)) {
+      //   if (val === 1) {
+      //     if (this.getNowMonth === 12 && this.getNowDay === 31) {
+      //       this.setNowDate(`${this.getNowYear + 1}-${1}-${1}`)
+      //     } else {
+      //       this.setNowDate(`${this.getNowYear}-${this.getNowMonth + 1}-${1}`)
+      //     }
+      //   } else {
+      //     if (this.getNowMonth === 1 && this.getNowDay === 1) {
+      //       this.setNowDate(`${this.getNowYear - 1}-${12}-${31}`)
+      //     } else {
+      //       this.setNowDate(`${this.getNowYear}-${this.getNowMonth - 1}-${this.countDaysInMonth(this.getNowYear, this.getNowMonth - 1)}`)
+      //     }
+      //   }
+      // } else {
+      //   this.setNowDate(`${this.getNowYear}-${this.getNowMonth}-${this.getNowDay + val}`)
+      // }
     },
     // count total days in a specific month
     countDaysInMonth(year, month) {

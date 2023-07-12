@@ -1,6 +1,7 @@
 <template>
-  <div class="container-xl bg-light" style="padding-top: 130px; padding-bottom: 70px;">
+  <div class="container-xl bg-light" style="padding-top: 130px; padding-bottom: 70px; width: 100vw;">
     <div class="row" v-for="time of timeline" :key="time">
+      <!-- <div class="col-3"></div> -->
       <div
         class="col-3 border border-right-0 border-top-0 text-center pt-5 pb-n1"
         style="min-height: 10vh;"
@@ -25,12 +26,13 @@
           borderWidth: isSelectedBlock(item, time) ? '2px !important' : '1px !important',
           paddingLeft: '0.5px !important',
           paddingRight: '0.5px !important',
+          overflow: 'hidden',
         }"
         v-for="item in weekMap"
         :key="item.day"
         @click="handleBlockClick({ ...item, time, booked: isBooked(item.events, time) })"
       >
-        <span style="{ background-color: #aaaaaa; color: #fff; white-space: nowrap; overflow: hidden; }">{{ isBooked(item.events, time).start ? isBooked(item.events, time).res : '' }}</span>
+        <span style="{ background-color: #aaaaaa; color: #fff; font-size: 12px; font-weight: 300; }">{{ isBooked(item.events, time).start ? isBooked(item.events, time).res : '' }}</span>
       </div>
     </div>
   </div>
