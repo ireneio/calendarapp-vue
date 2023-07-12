@@ -66,7 +66,6 @@ export default {
   },
   methods: {
     handleBlockClick(events, time) {
-      console.log(events, time)
       if (events.length) {
         const block = events.find((v) => v?.startTime === dayjs(`${events[0].date} ${time}`).subtract(15, 'minutes').format('HH:mm'))
         if (block) {
