@@ -122,7 +122,7 @@
       <div class="modal-dialog">
         <div class="modal-content" style="{ transform: translateY(100px); }">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">新增預約</h5>
+            <h5 class="modal-title" id="exampleModalLabel">{{ isFormReadOnly ? '查看' : '新增' }}預約</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
