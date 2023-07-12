@@ -82,6 +82,7 @@
       :week="filterEventsToCurrentWeek()"
       :events="filterEventsToCurrentDay()"
       @selected-block="handleWeekBlockSelect($event)"
+      @selected-block:day="handleDayBlockSelect($event)"
     ></router-view>
     <div
       class="container-xl position-fixed bg-white shadow-lg"
@@ -151,6 +152,7 @@
                   class="form-control"
                   id="exampleFormControlTextarea1"
                   rows="3"
+                  :readonly="isFormReadOnly"
                 ></textarea>
               </div>
               <div class="form-group col-24">
@@ -161,6 +163,7 @@
                   class="form-control"
                   id="exampleInputEmail1"
                   aria-describedby="emailHelp"
+                  :readonly="isFormReadOnly"
                 >
               </div>
               <div class="form-group col-12">
@@ -169,14 +172,15 @@
                   class="form-control"
                   id="exampleFormControlSelect1"
                   v-model="form.startTime"
+                  :readonly="isFormReadOnly"
                 >
                   <option value>選擇開始的時間</option>
-                  <option v-for="time in timelineMapStartTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value">{{ time?.value }}</option>
+                  <option v-for="time in timelineMapStartTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value" :readonly="isFormReadOnly">{{ time?.value }}</option>
                 </select>
               </div>
               <div class="form-group col-12">
                 <label for="exampleFormControlSelect2">結束時間</label>
-                <select class="form-control" id="exampleFormControlSelect2" v-model="form.endTime" :disabled="disableEndTimeSelect">
+                <select class="form-control" id="exampleFormControlSelect2" v-model="form.endTime" :disabled="disableEndTimeSelect" :readonly="isFormReadOnly">
                   <option value>選擇結束的時間</option>
                   <option v-for="time in timelineMapEndTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value">{{ time?.value }}</option>
                 </select>
@@ -186,12 +190,13 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="() => {
               clearForm()
-            }">取消</button>
+            }">{{ isFormReadOnly ? '關閉' : '取消' }}</button>
             <button
               type="button"
               class="btn btn-primary"
               @click="handleFormSubmit"
               :data-dismiss="alerts.length > 0 ? '' : 'modal'"
+              v-if="!isFormReadOnly"
             >提交</button>
           </div>
         </div>
@@ -224,7 +229,8 @@ export default {
       alerts: [],
       brand: process.env.VUE_APP_BRAND,
       selectedBlock: null,
-      showFooter: false
+      showFooter: false,
+      isFormReadOnly: false
     }
   },
   computed: {
@@ -414,10 +420,25 @@ export default {
         })
     },
     async handleWeekBlockSelect(block) {
-      console.log('block', block)
+      // console.log(block)
       this.selectedBlock = { ...block }
       this.form.date = dayjs(`${block?.year}/${block?.month}/${block?.day}`).format('YYYY-MM-DD')
       this.form.startTime = dayjs(`${block?.year}/${block?.month}/${block?.day} ${block?.time}`).subtract(15, 'minutes').format('HH:mm')
+      if (block?.isBooked) {
+        this.isFormReadOnly = true
+      } else {
+        this.isFormReadOnly = false
+        await sleep(600)
+        this.showFooter = true
+      }
+    },
+    async handleDayBlockSelect(block) {
+      console.log(block)
+      this.selectedBlock = { ...block }
+      this.form.date = block?.date
+      this.form.startTime = block?.startTime
+      this.form.endTime = block?.endTime
+      this.form.content = block?.content
       await sleep(600)
       this.showFooter = true
     }

@@ -31,6 +31,8 @@
         v-for="item in weekMap"
         :key="item.day"
         @click="handleBlockClick({ ...item, time, booked: isBooked(item.events, time) })"
+        data-target="#addEventModal"
+        data-toggle="modal"
       >
         <span style="{ background-color: #aaaaaa; color: #fff; font-size: 12px; font-weight: 300; }">{{ isBooked(item.events, time).start ? isBooked(item.events, time).res : '' }}</span>
       </div>
