@@ -433,7 +433,6 @@ export default {
       }
     },
     async handleDayBlockSelect(block) {
-      console.log(block)
       this.selectedBlock = { ...block }
       this.form.date = block?.date
       this.form.startTime = block?.startTime
