@@ -93,7 +93,7 @@ export default {
       })
     },
     handleBlockClick(block) {
-      console.log(block)
+      // console.log(block)
       const currentBlockEvents = this.getCurrentBlockEvents(block, block?.events || [])
       const event = currentBlockEvents.find((v) => v?.startTime === dayjs(`${block?.year}-${block?.month}-${block?.day} ${block?.time}`).subtract(0, 'minutes').format('HH:mm'))
       if (event) {

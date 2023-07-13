@@ -454,7 +454,7 @@ export default {
         })
     },
     async handleWeekBlockSelect(block) {
-      console.log('block', block)
+      // console.log('block', block)
       this.selectedBlock = { ...block }
       this.form.date = dayjs(`${block?.year}/${block?.month}/${block?.day}`).format('YYYY-MM-DD')
       if (block?.isBooked) {

@@ -81,7 +81,7 @@ export default {
       if (!events.length) {
         return
       }
-      console.log('events', events)
+      // console.log('events', events)
       const date = events[0].date.split('-')
       const currentBlockEvents = this.getCurrentBlockEvents({
         time,
@@ -89,7 +89,7 @@ export default {
         month: date[1],
         day: date[2]
       }, events)
-      console.log('currentBlockEvents', currentBlockEvents)
+      // console.log('currentBlockEvents', currentBlockEvents)
       if (currentBlockEvents.length) {
         // const block = currentBlockEvents.find((v) => v?.startTime === dayjs(`${date.join('-')} ${time}`).subtract(0, 'minutes').format('HH:mm'))
         const block = currentBlockEvents[0]
