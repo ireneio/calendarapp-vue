@@ -3,6 +3,7 @@
     <img class="mb-2" src="../assets/logo.png" alt="logo" style="{ width: 240px; height: 240px; object-fit: contain; vertical-align: middle; }">
     <h1 class="h4 mb-3 font-weight-bold text-center">我要預約 {{ brand }}</h1>
     <img
+      v-show="!pLdn"
       class="btn btn-lg btn-block"
       :src="btnSrc"
       @mouseover="handleBgChange(1)"
@@ -10,6 +11,7 @@
       @mousedown="handleBgChange(0)"
       @click="handleLogin"
     >
+    <default-loading></default-loading>
   </form>
 </template>
 
@@ -17,12 +19,18 @@
 // @ is an alias to /src
 import axios from 'axios'
 import { mapActions, mapState } from 'vuex'
+import DefaultLoading from '@/components/DefaultLoading.vue'
+
 export default {
   name: 'Home',
+  components: {
+    DefaultLoading
+  },
   data() {
     return {
       btnSrc: require('@/assets/btn_login_base.png'),
-      brand: process.env.VUE_APP_BRAND
+      brand: process.env.VUE_APP_BRAND,
+      pLdn: false
     }
   },
   computed: {
@@ -63,15 +71,17 @@ export default {
       if (vm.isLoggedIn) vm.$router.push({ name: 'week' })
     })
   },
-  mounted() {
+  async mounted() {
     if (location.href.includes('?code=')) {
       const code = location.href.split('?')[1].split('&')[0].split('=')[1]
       const state = 'ires_calendar'
-      axios.get(`${process.env.VUE_APP_API_URL}/users?code=${code}&state=${state}`)
+      this.pLdn = true
+      await axios.get(`${process.env.VUE_APP_API_URL}/users?code=${code}&state=${state}`)
         .then(res => {
           const { access_token: accessToken, refresh_token: refreshToken } = res.data
           this.verifyToken(accessToken, refreshToken)
         })
+      this.pLdn = false
     }
   }
 }

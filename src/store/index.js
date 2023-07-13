@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import _ from 'lodash'
+import dayjs from 'dayjs'
 
 Vue.use(Vuex)
 
@@ -82,13 +84,28 @@ export default new Vuex.Store({
       return axios
         .get(`${process.env.VUE_APP_API_URL}/events/${state.userId}`)
         .then(res => {
-          commit('setEvents', res.data.events)
+          const arr = res.data.events.filter((v) => v.userId).map((v, i) => ({ ...v, startDate: dayjs(`${v?.date} ${v?.startTime}`).toISOString(), order: i }))
+          const gb = _.groupBy(arr, function(v) { return v.startDate })
+          const map = Object.entries(gb).map(([key, value]) => {
+            return [key, [...value].sort((a, b) => b.order - a.order)]
+          }).map(([key, value]) => {
+            return [key, value.filter((v, i) => i === 0)]
+          }).map(([key, value]) => {
+            return [key, value.filter((v) => !v.deleted)]
+          }).filter(([key, value]) => {
+            return value.length > 0
+          }).map(([key, value]) => {
+            return value
+          })
+          const result = _.flatten(map)
+          // console.log(result)
+          commit('setEvents', result)
         })
     },
     UPDATE_events({ commit, state }, payload) {
       return axios
         .post(`${process.env.VUE_APP_API_URL}/events/${state.userId}`, {
-          event: payload
+          event: { ...payload, displayName: state.displayName, userId: state.userId }
         })
         .then(res => {
           commit('setEvents', [...state.events, payload])

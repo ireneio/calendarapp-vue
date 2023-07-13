@@ -26,12 +26,15 @@
         <div class="col-24 mt-3">
           <Month :year="getNowYear" :month="getNowMonth"/>
           <div class="calender__btnblock pb-2 clearfix pt-1">
-            <span v-for="day in weeks" :key="day.id" class="calender__btn">{{ day.n }}</span>
+            <span v-for="day in weeks" :key="day.id" class="calender__btn">
+              <div>{{ day.n.split('(')[0] }}</div>
+              <div>{{ `(${day.n.split('(')[1]}` }}</div>
+            </span>
           </div>
         </div>
       </div>
     </div>
-    <div class="container-xl bg-light" style="padding-top: 140px;">
+    <div class="container-xl bg-light" style="padding-top: 154px;">
       <div class="row" id="datesArea">
         <div class="col-24" v-for="(date, index) in dates" :key="date.month.toString()+date.year">
           <Month :year="date.year" :month="date.month" v-if="index > currentDateIndex"/>
@@ -51,6 +54,7 @@ import { mapGetters, mapState } from 'vuex'
 import Dates from '@/components/Dates'
 import Month from '@/components/Month'
 import weeksData from '@/mixins/weeksData'
+import { sleep } from '@/utils/general'
 
 export default {
   components: {
@@ -58,6 +62,11 @@ export default {
     Month
   },
   mixins: [weeksData],
+  data() {
+    return {
+      selectLdn: false
+    }
+  },
   computed: {
     ...mapGetters(['getNowYear', 'getNowMonth']),
     ...mapState(['dates']),
@@ -80,10 +89,13 @@ export default {
     }
   },
   methods: {
-    handleDateSelect(date) {
+    async handleDateSelect(date) {
+      this.selectLdn = true
       const { day, month, year } = date
       this.currentCalender = `${year}-${month}-${day}`
       this.$router.push({ name: 'week' })
+      await sleep(600)
+      this.selectLdn = false
     }
   }
 }
