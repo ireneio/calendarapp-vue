@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "start": "node sammy.js; serve -s dist -l tcp://0.0.0.0:${PORT:-8080} -n",
+    "start": "node startup.js; serve -s dist -l tcp://0.0.0.0:${PORT:-8080} -n",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
