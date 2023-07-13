@@ -14,4 +14,4 @@ RUN npm install -g yarn && yarn && yarn build
 
 EXPOSE 8080
 
-CMD [ "npm", "start" ]
+CMD [ "yarn", "start" ]
