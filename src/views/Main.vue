@@ -454,7 +454,7 @@ export default {
         })
     },
     async handleWeekBlockSelect(block) {
-      // console.log(block)
+      console.log('block', block)
       this.selectedBlock = { ...block }
       this.form.date = dayjs(`${block?.year}/${block?.month}/${block?.day}`).format('YYYY-MM-DD')
       if (block?.isBooked) {
@@ -469,6 +469,8 @@ export default {
         this.form.startTime = dayjs(`${block?.year}/${block?.month}/${block?.day} ${block?.event?.startTime}`).subtract(0, 'minutes').format('HH:mm')
       } else if (!find.disabled) {
         this.form.startTime = dayjs(`${block?.year}/${block?.month}/${block?.day} ${block?.time}`).subtract(0, 'minutes').format('HH:mm')
+      } else {
+        this.form.startTime = ''
       }
       if (block?.event !== null && block?.event?.userId === this.userId && block?.event?.startTime === block?.time && block?.isBooked) {
         this.isFormReadOnly = false
