@@ -85,8 +85,6 @@ export default {
       if (!events.length) {
         return
       }
-      // console.log('events', events)
-      // const date = events[0].date.split('-')
       const date = this.getNowDay.split('-')
       const currentBlockEvents = this.getCurrentBlockEvents({
         time,
@@ -94,12 +92,8 @@ export default {
         month: date[1],
         day: date[2]
       }, events)
-      // console.log('currentBlockEvents', currentBlockEvents)
       if (currentBlockEvents.length) {
-        // const block = currentBlockEvents.find((v) => v?.startTime === dayjs(`${date.join('-')} ${time}`).subtract(0, 'minutes').format('HH:mm'))
         const block = currentBlockEvents[0]
-        // console.log('block', block)
-        // console.log('this.isBooked(events, time)', this.isBooked(events, time, true))
         if (block) {
           this.selectedBlock = {
             ...block,
@@ -132,23 +126,6 @@ export default {
     },
     isSelectedBlock(events, time) {
       return this.selectedBlock.startTime === time
-      // if (!events.length) {
-      //   return false
-      // }
-      // const date = events[0].date.split('-')
-      // const currentBlockEvents = this.getCurrentBlockEvents({
-      //   time,
-      //   year: date[0],
-      //   month: date[1],
-      //   day: date[2]
-      // }, events)
-      // if (currentBlockEvents.length) {
-      //   const item = currentBlockEvents[0]
-      //   console.log('item', item)
-      //   console.log(this.selectedBlock)
-      //   return this.selectedBlock?.date === item.date && this.selectedBlock?.startTime === item.startTime && this.selectedBlock?.endTime === item?.endTime
-      // }
-      // return false
     }
   }
 }
