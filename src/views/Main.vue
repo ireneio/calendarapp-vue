@@ -28,7 +28,6 @@
                 {{ $route.path.includes('week') ? '週檢視' : '日檢視' }}
                 <fa icon="caret-down"></fa>
               </a>
-
               <div class="dropdown">
                 <a
                   class="ml-2 text-white btn btn-danger rounded-circle pl-3 pr-3 pt-2"
