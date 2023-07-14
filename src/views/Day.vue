@@ -112,7 +112,8 @@ export default {
           this.selectedBlock = {
             date: date.join('-'),
             startTime: dayjs(`${date.join('-')} ${time}`).subtract(0, 'minutes').format('HH:mm'),
-            endTime: dayjs(`${date.join('-')} ${time}`).add(15, 'minutes').format('HH:mm'),
+            endTime: null,
+            // endTime: dayjs(`${date.join('-')} ${time}`).add(15, 'minutes').format('HH:mm'),
             content: '',
             event: null
           }
