@@ -80,9 +80,9 @@ export default new Vuex.Store({
       commit('setDisplayName', displayName || null)
       commit('setUserId', userId || null)
     },
-    GET_events({ commit, state }) {
+    GET_events({ commit, state }, payload) {
       return axios
-        .get(`${process.env.VUE_APP_API_URL}/events/${state.userId}`)
+        .get(`${process.env.VUE_APP_API_URL}/events/${payload?.assignee?.id}`)
         .then(res => {
           const arr = res.data.events.filter((v) => v.userId).map((v, i) => ({ ...v, startDate: dayjs(`${v?.date} ${v?.startTime}`).toISOString(), order: i }))
           const gb = _.groupBy(arr, function(v) { return v.startDate })
@@ -104,8 +104,8 @@ export default new Vuex.Store({
     },
     UPDATE_events({ commit, state }, payload) {
       return axios
-        .post(`${process.env.VUE_APP_API_URL}/events/${state.userId}`, {
-          event: { ...payload, displayName: state.displayName, userId: state.userId }
+        .post(`${process.env.VUE_APP_API_URL}/events/${payload?.assignee?.id}`, {
+          event: { ...payload, displayName: state.displayName, userId: payload?.assignee?.id }
         })
         .then(res => {
           commit('setEvents', [...state.events, payload])

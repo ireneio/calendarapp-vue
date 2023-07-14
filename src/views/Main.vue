@@ -163,10 +163,10 @@
                   class="form-control"
                   id="exampleFormControlSelect1"
                   v-model="form.assignee"
-                  :disabled="isFormReadOnly"
+                  :disabled="isFormReadOnly || !form.assignee.id"
                 >
-                  <option value>選擇預約項目</option>
-                  <option v-for="item in assigneeListMap" :disabled="item?.disabled" :key="item?.name" :value="item">{{ item?.name }}</option>
+                  <option value>選擇預約人員</option>
+                  <option v-for="item in assigneeListMap" :disabled="item?.disabled" :key="item?.id" :value="item">{{ item?.name }}</option>
                 </select>
               </div>
               <div class="form-group col-24">
@@ -264,8 +264,8 @@ export default {
           length: ''
         },
         assignee: {
-          id: '1',
-          name: 'Ires'
+          id: '',
+          name: ''
         }
       },
       alerts: [],
@@ -370,7 +370,7 @@ export default {
       }
     },
     async getEvents() {
-      await this.GET_events()
+      await this.GET_events({ ...this.form })
     },
     filterEventsToCurrentWeek() {
       const filteredEvents = this.events
@@ -535,6 +535,12 @@ export default {
         } else {
           this.showMyBook = false
         }
+      }
+      // init default assignee
+      if (this.assigneeListMap.length) {
+        this.form.assignee = this.assigneeListMap[0]
+      } else {
+        this.form.assignee = { id: '', name: '' }
       }
       this.pageLoading = false
     })
