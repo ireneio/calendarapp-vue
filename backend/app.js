@@ -50,7 +50,8 @@ app.use('/users', usersRouter)
 app.use('/events', eventsRouter)
 
 app.use('/', function(req, res, next) {
-  res.send('Server Running')
+  res.status(401)
+  res.send('<div></div>')
 })
 
 // catch 404 and forward to error handler
