@@ -36,7 +36,7 @@
         data-target="#addEventModal"
         data-toggle="modal"
       >
-        <div v-if="isBooked(events, time).userId === userId">
+        <div v-if="isBooked(item.events, time).userId === userId">
           <span v-if="isBooked(item.events, time).hasEvent" style="{ background-color: #aaaaaa; color: #fff; font-size: 14px; font-weight: 500; }">{{ isBooked(item.events, time).start ? `[${isBooked(item.events, time).name}]` : '' }}</span>
           <div style="{ background-color: #aaaaaa; color: #fff; font-size: 12px; font-weight: 300; }" class="mt-2">{{ isBooked(item.events, time).start ? isBooked(item.events, time).res : '' }}</div>
         </div>

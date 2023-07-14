@@ -81,6 +81,7 @@ export default new Vuex.Store({
       commit('setUserId', userId || null)
     },
     GET_events({ commit, state }, payload) {
+      console.log(payload)
       return axios
         .get(`${process.env.VUE_APP_API_URL}/events/${payload?.assignee?.id}`)
         .then(res => {

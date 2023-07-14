@@ -75,6 +75,7 @@
         </div>
       </div>
     </div>
+    <div>{{ '人員: ' + form.assignee.name }}</div>
     <router-view
       :timeline="timeline"
       :week="filterEventsToCurrentWeek()"
@@ -375,7 +376,9 @@ export default {
       }
     },
     async getEvents() {
-      await this.GET_events({ ...this.form })
+      if (this.form.assignee.id) {
+        await this.GET_events({ ...this.form })
+      }
     },
     filterEventsToCurrentWeek() {
       const filteredEvents = this.events
@@ -527,9 +530,6 @@ export default {
   created() {
     this.pageLoading = true
     this.makeTimeline()
-    // await this.getEvents().then(() => {
-    //   this.clearForm()
-    // })
   },
   mounted() {
     this.$nextTick(async () => {
@@ -543,6 +543,7 @@ export default {
       }
       // init default assignee
       if (this.assigneeListMap.length) {
+        console.log('this.assigneeListMap', this.assigneeListMap)
         this.form.assignee = this.assigneeListMap[0]
         await this.getEvents().then(() => {
           this.clearForm()

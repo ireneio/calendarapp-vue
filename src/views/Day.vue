@@ -72,7 +72,7 @@ export default {
   },
   computed: {
     ...mapState(['userId']),
-    ...mapGetters(['getNowDay']),
+    ...mapGetters(['getNowDay'])
   },
   methods: {
     getCurrentBlockEvents(block, events) {
