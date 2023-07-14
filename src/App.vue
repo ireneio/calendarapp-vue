@@ -39,7 +39,7 @@ export default {
       let obj
       const totalDays = 42
       const startYear = new Date().getFullYear()
-      const limit = 2
+      const limit = 0
       for (let i = startYear; i <= startYear + limit; i++) {
         obj = {}
         obj.year = i
