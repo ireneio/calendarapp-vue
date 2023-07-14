@@ -308,7 +308,7 @@ export default {
       })
     },
     assigneeListMap() {
-      return assigneeList
+      return assigneeList.filter((v) => v?.group && v?.group === process.env.VUE_APP_ASSIGNEE_GROUP)
     },
     timelineMapStartTime() {
       const events = this.filterEventsToCurrentWeek()

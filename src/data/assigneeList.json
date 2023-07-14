@@ -1,4 +1,4 @@
 [
-  { "id": "U1a7accbd29cbedc654e3f4ede7fbab63", "name": "Ires" },
-  { "id": "2", "name": "Lian" }
+  { "id": "U1a7accbd29cbedc654e3f4ede7fbab63", "name": "Ires", "group": "ires" },
+  { "id": "2", "name": "Lian", "group": "ires" }
 ]
