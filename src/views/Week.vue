@@ -37,9 +37,11 @@
         data-target="#addEventModal"
         data-toggle="modal"
       >
-        <span v-if="isBooked(item.events, time).hasEvent" style="{ background-color: #aaaaaa; color: #fff; font-size: 14px; font-weight: 500; }">{{ isBooked(item.events, time).start ? `[${isBooked(item.events, time).name}]` : '' }}</span>
-        <div style="{ background-color: #aaaaaa; color: #fff; font-size: 12px; font-weight: 300; }" class="mt-2">{{ isBooked(item.events, time).start ? isBooked(item.events, time).res : '' }}</div>
-        <!-- <div v-if="isBooked(item.events, time).start" class="mt-2" style="{ color: #aaaaaa }">{{ `預約人: ${isBooked(item.events, time).applier}` }}</div> -->
+        <div v-if="isBooked(events, time).userId === userId">
+          <span v-if="isBooked(item.events, time).hasEvent" style="{ background-color: #aaaaaa; color: #fff; font-size: 14px; font-weight: 500; }">{{ isBooked(item.events, time).start ? `[${isBooked(item.events, time).name}]` : '' }}</span>
+          <div style="{ background-color: #aaaaaa; color: #fff; font-size: 12px; font-weight: 300; }" class="mt-2">{{ isBooked(item.events, time).start ? isBooked(item.events, time).res : '' }}</div>
+        </div>
+        <div v-else></div>
       </div>
     </div>
   </div>
@@ -49,6 +51,7 @@
 import checkBookingBlock from '@/mixins/checkBookingBlock'
 import reformatTime from '@/mixins/reformatTime'
 import dayjs from 'dayjs'
+import { mapState } from 'vuex'
 
 export default {
   mixins: [checkBookingBlock, reformatTime],
@@ -68,6 +71,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['userId']),
     weekMap() {
       return this.week.map((v) => {
         return {
@@ -109,10 +113,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-/* .bg-booked {
-  background-color: purple;
-  color: #fff;
-} */
-</style>

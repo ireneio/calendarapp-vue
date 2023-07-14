@@ -32,9 +32,11 @@
         data-toggle="modal"
         @click="handleBlockClick(events, time)"
       >
-        <span v-if="isBooked(events, time).hasEvent" style="{ background-color: #aaaaaa; color: #fff; font-size: 14px; font-weight: 500; }">{{ isBooked(events, time).start ? `[${isBooked(events, time).name}]` : '' }}</span>
-        <div style="{ background-color: #aaaaaa; color: #fff; font-size: 12px; font-weight: 300; }" class="mt-2">{{ isBooked(events, time).start ? isBooked(events, time).res : '' }}</div>
-        <!-- <div v-if="isBooked(events, time).hasEvent" class="mt-2" style="{ color: #181818 !important }">{{ `預約人: ${isBooked(events, time).applier}` }}</div> -->
+        <div v-if="isBooked(events, time).userId === userId">
+          <span v-if="isBooked(events, time).hasEvent" style="{ background-color: #aaaaaa; color: #fff; font-size: 14px; font-weight: 500; }">{{ isBooked(events, time).start ? `[${isBooked(events, time).name}]` : '' }}</span>
+          <div style="{ background-color: #aaaaaa; color: #fff; font-size: 12px; font-weight: 300; }" class="mt-2">{{ isBooked(events, time).start ? isBooked(events, time).res : '' }}</div>
+        </div>
+        <div v-else></div>
       </div>
     </div>
   </div>
@@ -44,7 +46,7 @@
 import checkBookingBlock from '@/mixins/checkBookingBlock'
 import reformatTime from '@/mixins/reformatTime'
 import dayjs from 'dayjs'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 export default {
   mixins: [checkBookingBlock, reformatTime],
   props: {
@@ -69,6 +71,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['userId']),
     ...mapGetters(['getNowDay']),
   },
   methods: {
