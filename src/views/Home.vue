@@ -78,9 +78,9 @@ export default {
       const state = process.env.NODE_ENV === 'production' ? 'ires_calendar_prd' : 'ires_calendar'
       this.pLdn = true
       await axios.get(`${process.env.VUE_APP_API_URL}/users?code=${code}&state=${state}`)
-        .then(res => {
+        .then(async (res) => {
           const { access_token: accessToken, refresh_token: refreshToken } = res.data
-          this.verifyToken(accessToken, refreshToken)
+          await this.verifyToken(accessToken, refreshToken)
         })
       this.pLdn = false
     }
