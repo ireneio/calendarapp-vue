@@ -117,7 +117,7 @@ export default {
             content: '',
             event: null
           }
-          this.$emit('selected-block:day', { ...this.selectedBlock, event: null, isBooked: false })
+          this.$emit('selected-block:day', { ...this.selectedBlock, isBooked: false })
         }
       } else {
         this.selectedBlock = {
