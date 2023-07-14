@@ -9,7 +9,7 @@
           <div class="d-flex align-items-center">
             <button
               class="bg-secondary text-primary rounded-circle btn"
-              style="font-size:16px; transform: translateY(5px);"
+              style="font-size: 16px; transform: translateY(5px);"
             >
               <fa :icon="['far', 'calendar']"></fa>
             </button>
