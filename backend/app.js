@@ -11,6 +11,9 @@ const eventsRouter = require('./routes/events')
 
 const app = express()
 
+console.log('[env] MONGO_URI: ', process.env.MONGO_URI);
+console.log('[env] REDIRECT_URL: ', process.env.REDIRECT_URL);
+
 // connect DB
 ;(async function() {
   try {
