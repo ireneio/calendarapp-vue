@@ -83,7 +83,7 @@
       @selected-block="handleWeekBlockSelect($event)"
       @selected-block:day="handleDayBlockSelect($event)"
     ></router-view>
-    <div style="color: #181818; text-align: center; padding: 24px 0;">{{ `Copyright. Ires Consulting 2022-${Date.now().getFullYear()}. All rights reserved.` }}</div>
+    <div style="color: #181818; text-align: center; padding: 24px 0;">{{ `Copyright. Ires Consulting 2022-${Date.now().getFullYear}. All rights reserved.` }}</div>
     <div
       class="container-xl position-fixed bg-white shadow-lg"
       style="{ transition: transform .66s; }"
