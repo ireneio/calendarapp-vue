@@ -2,14 +2,14 @@
   <div>
     <div
       class="container-xl shadow-md bg-white position-fixed"
-      style="z-index: 1000; left:50%; transform:translateX(-50%);"
+      style="z-index: 1000; left:50%; transform: translateX(-50%);"
     >
       <div class="row">
         <div class="col-24">
           <div class="d-flex align-items-center">
             <button
               class="bg-secondary text-primary rounded-circle btn"
-              style="font-size:16px; transform:translateY(5px);"
+              style="font-size:16px; transform: translateY(5px);"
             >
               <fa :icon="['far', 'calendar']"></fa>
             </button>

@@ -38,7 +38,9 @@ export default {
       const res = []
       let obj
       const totalDays = 42
-      for (let i = 1900; i <= 2100; i++) {
+      const startYear = new Date().getFullYear()
+      const limit = 2
+      for (let i = startYear; i <= startYear + limit; i++) {
         obj = {}
         obj.year = i
         for (let j = 1; j <= 12; j++) {
