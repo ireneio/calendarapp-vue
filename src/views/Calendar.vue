@@ -16,7 +16,7 @@
             <h1 class="ml-2 mt-3 h5">選擇日期</h1>
             <a
               href="javascript:;"
-              class="ml-auto mt-3 h3 text-decoration-none text-dark"
+              class="ml-auto mt-2 h3 text-decoration-none text-dark"
               @click="$router.push({ name: 'week'})"
             >&times;</a>
           </div>
