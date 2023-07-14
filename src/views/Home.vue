@@ -74,7 +74,7 @@ export default {
   async mounted() {
     if (location.href.includes('?code=')) {
       const code = location.href.split('?')[1].split('&')[0].split('=')[1]
-      const state = 'ires_calendar'
+      const state = process.env.NODE_ENV === 'production' ? 'ires_calendar_prd' : 'ires_calendar'
       this.pLdn = true
       await axios.get(`${process.env.VUE_APP_API_URL}/users?code=${code}&state=${state}`)
         .then(res => {
