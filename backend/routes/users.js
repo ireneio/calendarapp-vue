@@ -3,7 +3,6 @@ var router = express.Router()
 const axios = require('axios')
 const querystring = require('querystring')
 const userController = require('../controllers/user')
-const env = require('dotenv').config().parsed
 
 // get access token
 router.get('/', function(req, res, next) {
@@ -14,7 +13,7 @@ router.get('/', function(req, res, next) {
       querystring.stringify({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: env.REDIRECT_URL,
+        redirect_uri: process.env.REDIRECT_URL,
         client_id: '1654358305',
         client_secret: 'ed4b0eae144af0b29c0040eef5dace48'
       }),
