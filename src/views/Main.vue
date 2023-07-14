@@ -74,8 +74,21 @@
           </button>
         </div>
       </div>
+      <div style="background-color: #eeeeee; padding: 12px 8px; display: flex; align-items: center; border-bottom: 1px solid #dddddd;" class="shadow-md">
+        <span style="flex-basis: 48px; flex-shrink: 0;">{{ '人員: ' }}</span>
+        <div style="flex-basis: 140px; flex-grow: 0;">
+          <select
+            class="form-control"
+            id="exampleFormControlSelect1"
+            v-model="form.assignee"
+            :disabled="false"
+          >
+            <!-- <option value>選擇預約人員</option> -->
+            <option v-for="item in assigneeListMap" :disabled="item?.disabled" :key="item?.id" :value="item">{{ item?.name }}</option>
+          </select>
+        </div>
+      </div>
     </div>
-    <div>{{ '人員: ' + form.assignee.name }}</div>
     <router-view
       :timeline="timeline"
       :week="filterEventsToCurrentWeek()"
@@ -83,7 +96,13 @@
       @selected-block="handleWeekBlockSelect($event)"
       @selected-block:day="handleDayBlockSelect($event)"
     ></router-view>
-    <div style="color: #181818; text-align: center; padding: 24px 0; font-size: 12px;">{{ `Copyright. Ires Consulting 2022-${new Date().getFullYear()}. All rights reserved.` }}</div>
+    <!-- footer -->
+    <div style="color: #bbbbbb; text-align: center; padding: 8px 0; font-size: 12px;">
+      <span>Copyright.</span>
+      <span class="ml-1" style="color: rgba(179, 155, 92, 0.75) !important; cursor: pointer; text-decoration: none;" @click="handleExtLink()">Ires Consulting</span>
+      <span class="ml-1">{{ `2022-${new Date().getFullYear()}. All rights reserved.` }}</span>
+    </div>
+    <!-- action sheet -->
     <div
       class="container-xl position-fixed bg-white shadow-lg"
       style="{ transition: transform .66s; }"
@@ -111,6 +130,7 @@
         </div>
       </div>
     </div>
+    <!-- block modal -->
     <div
       class="modal fade"
       id="addEventModal"
@@ -165,7 +185,7 @@
                   v-model="form.assignee"
                   :disabled="isFormReadOnly || !form.assignee.id"
                 >
-                  <option value>選擇預約人員</option>
+                  <!-- <option value>選擇預約人員</option> -->
                   <option v-for="item in assigneeListMap" :disabled="item?.disabled" :key="item?.id" :value="item">{{ item?.name }}</option>
                 </select>
               </div>

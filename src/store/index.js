@@ -101,6 +101,8 @@ export default new Vuex.Store({
           const result = _.flatten(map)
           // console.log(result)
           commit('setEvents', result)
+        }).catch(() => {
+          commit('setEvents', [])
         })
     },
     UPDATE_events({ commit, state }, payload) {
