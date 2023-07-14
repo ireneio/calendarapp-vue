@@ -335,6 +335,12 @@ export default {
     },
     'form.applyType.length'(v) {
       this.form.endTime = dayjs(`${this.form.date} ${this.form.startTime}`).add(v, 'minutes').format('HH:mm')
+    },
+    'form.assignee.id': {
+      handler(v) {
+        this.getEvents()
+      },
+      immediate: true
     }
   },
   methods: {
@@ -519,15 +525,15 @@ export default {
       window.open('https://iresconsulting.com/', '_blank')
     }
   },
-  async created() {
+  created() {
     this.pageLoading = true
     this.makeTimeline()
-    await this.getEvents().then(() => {
-      this.clearForm()
-    })
+    // await this.getEvents().then(() => {
+    //   this.clearForm()
+    // })
   },
   mounted() {
-    this.$nextTick(() => {
+    this.$nextTick(async () => {
       const cst = window.localStorage.getItem('calendar_show_type')
       if (cst) {
         if (cst === 'my') {
@@ -539,6 +545,9 @@ export default {
       // init default assignee
       if (this.assigneeListMap.length) {
         this.form.assignee = this.assigneeListMap[0]
+        await this.getEvents().then(() => {
+          this.clearForm()
+        })
       } else {
         this.form.assignee = { id: '', name: '' }
       }
