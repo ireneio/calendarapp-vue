@@ -357,8 +357,11 @@ export default {
       this.form.endTime = dayjs(`${this.form.date} ${this.form.startTime}`).add(v, 'minutes').format('HH:mm')
     },
     'form.assignee.id': {
-      handler(v) {
-        this.getEvents()
+      async handler(v) {
+        this.pageLoading = true
+        await this.getEvents()
+        this.clearForm()
+        this.pageLoading = false
       },
       immediate: true
     }
