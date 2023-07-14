@@ -74,18 +74,20 @@
           </button>
         </div>
       </div>
-      <div style="background-color: #eeeeee; padding: 12px 8px; display: flex; align-items: center; border-bottom: 1px solid #dddddd;" class="row shadow-md">
-        <span style="flex-basis: 48px; flex-shrink: 0;">{{ '人員: ' }}</span>
-        <div style="flex-basis: 140px; flex-grow: 0;">
-          <select
-            class="form-control"
-            id="exampleFormControlSelect1"
-            v-model="form.assignee"
-            :disabled="false"
-          >
-            <!-- <option value>選擇預約人員</option> -->
-            <option v-for="item in assigneeListMap" :disabled="item?.disabled" :key="item?.id" :value="item">{{ item?.name }}</option>
-          </select>
+      <div class="row">
+        <div style="background-color: #eeeeee; padding: 12px 8px; display: flex; align-items: center; border-bottom: 1px solid #dddddd;" class="shadow-md">
+          <span style="flex-basis: 48px; flex-shrink: 0;">{{ '人員: ' }}</span>
+          <div style="flex-basis: 140px; flex-grow: 0;">
+            <select
+              class="form-control"
+              id="exampleFormControlSelect1"
+              v-model="form.assignee"
+              :disabled="false"
+            >
+              <!-- <option value>選擇預約人員</option> -->
+              <option v-for="item in assigneeListMap" :disabled="item?.disabled" :key="item?.id" :value="item">{{ item?.name }}</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
