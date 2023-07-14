@@ -46,6 +46,7 @@
         </div>
       </div>
     </div>
+    <!-- <snackbar ref="snackbar" baseSize="100px" :wrapClass="''" :colors="null" :holdTime="3000" :multiple="true"/> -->
   </div>
 </template>
 
@@ -90,6 +91,11 @@ export default {
   },
   methods: {
     async handleDateSelect(date) {
+      if (this.selectLdn) {
+        // this.$refs.snackbar.warn('msg')
+        // this.$refs.snackbar.open('msg')
+        return
+      }
       this.selectLdn = true
       const { day, month, year } = date
       this.currentCalender = `${year}-${month}-${day}`

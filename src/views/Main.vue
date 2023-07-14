@@ -13,11 +13,11 @@
                 class="d-flex align-items-center mr-2"
                 >
                 <a href="javascript:;" class="text-dark btn" @click="adjustDay($route.path.includes('day') ? -1 : -7)">
-                  <fa icon="arrow-alt-circle-left"></fa>
+                  <fa icon="arrow-alt-circle-left" style="font-size: 18px; color: #181818;"></fa>
                 </a>
-                <div>{{ getNowYear + ' / ' + getNowMonth }}</div>
+                <div class="mb-1" style="color: #181818; font-weight: 500; letter-spacing: 2px;">{{ getNowMonth + '月 ' + getNowYear }}</div>
                 <a href="javascript:;" class="text-dark btn" @click="adjustDay($route.path.includes('day') ? 1 : 7)">
-                  <fa icon="arrow-alt-circle-right"></fa>
+                  <fa icon="arrow-alt-circle-right" style="font-size: 18px; color: #181818;"></fa>
                 </a>
               </div>
               <a
@@ -94,8 +94,8 @@
         @click.stop="() => showFooter = false"
       >&times;</span>
       <span
-        class="position-absolute text-dark"
-        style="{ top: 0; left: 12px; z-index: 2; transform: translateY(8px); text-decoration: none; cursor: pointer; font-size: 12px; }"
+        class="position-absolute"
+        style="{ top: 0; left: 12px; z-index: 2; transform: translateY(8px); text-decoration: none; cursor: pointer; font-size: 12px; color: #aaaaaa; }"
         @click="adjustDay('now')"
       >回到當日</span>
       <div class="row">
@@ -212,7 +212,7 @@
           </div>
           <div class="modal-footer">
             <button v-if="selectedBlock?.booked?.start && selectedBlock?.booked?.hasEvent && selectedBlock?.booked?.userId === userId" type="button" class="btn btn-danger" data-dismiss="modal" @click="handleDeleteBookedBlock()">{{ '刪除' }}</button>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="() => {
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" :disabled="pageLoading" @click="() => {
               clearForm()
             }">{{ isFormReadOnly ? '關閉' : '取消' }}</button>
             <button
@@ -227,6 +227,7 @@
       </div>
     </div>
     <default-loading :invoke-on-mount="false" :handle-start="pageLoading" :handle-finish="!pageLoading"></default-loading>
+    <!-- <snackbar ref="snackbar" baseSize="100px" :wrapClass="''" :colors="null" :holdTime="3000" :multiple="true"/> -->
   </div>
 </template>
 
@@ -338,9 +339,12 @@ export default {
   methods: {
     ...mapMutations(['setNowDate']),
     ...mapActions(['GET_events', 'UPDATE_events', 'updateLoginStatus']),
-    handleShowMyBook(val) {
+    async handleShowMyBook(val) {
+      this.pageLoading = true
       this.showMyBook = val
       window.localStorage.setItem('calendar_show_type', val ? 'my' : 'all')
+      await sleep(600)
+      this.pageLoading = false
     },
     async clearForm() {
       await sleep(600)
@@ -360,8 +364,6 @@ export default {
         const hour = parseInt(i).toString()
         const minStr = String(i)
         const min = minStr.includes('.25') ? '15' : minStr.includes('.5') ? '30' : minStr.includes('.75') ? '45' : '00'
-        // const zone = parseInt(i) < 12 ? 'am' : 'pm'
-        // const str = hour + ':' + min + zone
         const str = hour + ':' + min
         this.timeline = [...this.timeline, str]
       }
@@ -385,7 +387,6 @@ export default {
           return { ...weekDay, events: [] }
         }
       })
-      // console.log(res)
       if (this.showMyBook) {
         return res.map((v) => ({
           ...v,
@@ -409,6 +410,9 @@ export default {
       this.handleFormSubmit('delete')
     },
     async handleFormSubmit(action) {
+      if (this.pageLoading) {
+        return
+      }
       // if (this.form.content === '' || this.form.startTime === '' || this.form.endTime === '' || this.form.date === '') {
       if (this.form.startTime === '' || this.form.endTime === '' || this.form.date === '') {
         if (this.alerts.indexOf('請填入所有欄位') === -1) this.alerts.push('請填入所有欄位')
@@ -420,9 +424,13 @@ export default {
         if (this.alerts.indexOf('開始時間不得晚於結束時間') === -1) this.alerts.push('開始時間不得晚於結束時間')
         return false
       }
+      this.pageLoading = true
       await this.UPDATE_events({ ...this.form, deleted: action === 'delete' })
-      this.getEvents()
+      await this.getEvents()
+      // this.$refs.snackbar.warn('msg')
+      // this.$refs.snackbar.open('msg')
       this.clearForm()
+      this.pageLoading = false
     },
     // change current day with a specific date
     selectDay(date) {
@@ -452,13 +460,15 @@ export default {
             : 28
           : 31
     },
-    handleLogout() {
+    async handleLogout() {
+      this.pageLoading = true
       const accessToken = localStorage.getItem('token')
-      axios.post(`${process.env.VUE_APP_API_URL}/users/revoke`, { accessToken })
+      await axios.post(`${process.env.VUE_APP_API_URL}/users/revoke`, { accessToken })
         .then(() => {
           this.updateLoginStatus({ status: false, accessToken: '', userId: null, displayName: null })
           this.$router.push({ name: 'Home' })
         })
+      this.pageLoading = false
     },
     async handleWeekBlockSelect(block) {
       // console.log('block', block)
@@ -486,7 +496,7 @@ export default {
       } else {
         this.isFormReadOnly = false
       }
-      await sleep(600)
+      await sleep(300)
       this.showFooter = true
     },
     async handleDayBlockSelect(block) {
@@ -500,7 +510,7 @@ export default {
         this.isFormReadOnly = true
       } else {
         this.isFormReadOnly = false
-        await sleep(600)
+        await sleep(300)
         this.showFooter = true
       }
     }
