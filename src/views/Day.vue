@@ -44,6 +44,7 @@
 import checkBookingBlock from '@/mixins/checkBookingBlock'
 import reformatTime from '@/mixins/reformatTime'
 import dayjs from 'dayjs'
+import { mapGetters } from 'vuex'
 export default {
   mixins: [checkBookingBlock, reformatTime],
   props: {
@@ -67,6 +68,9 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(['getNowDay']),
+  },
   methods: {
     getCurrentBlockEvents(block, events) {
       const date = `${block?.year}-${block?.month}-${block?.day}`
@@ -82,7 +86,8 @@ export default {
         return
       }
       // console.log('events', events)
-      const date = events[0].date.split('-')
+      // const date = events[0].date.split('-')
+      const date = this.getNowDay.split('-')
       const currentBlockEvents = this.getCurrentBlockEvents({
         time,
         year: date[0],
@@ -106,8 +111,8 @@ export default {
         } else {
           this.selectedBlock = {
             date: date.join('-'),
-            startTime: dayjs(`${date} ${time}`).subtract(0, 'minutes').format('HH:mm'),
-            endTime: dayjs(`${date} ${time}`).add(15, 'minutes').format('HH:mm'),
+            startTime: dayjs(`${date.join('-')} ${time}`).subtract(0, 'minutes').format('HH:mm'),
+            endTime: dayjs(`${date.join('-')} ${time}`).add(15, 'minutes').format('HH:mm'),
             content: '',
             event: null
           }
@@ -116,12 +121,12 @@ export default {
       } else {
         this.selectedBlock = {
           date: date.join('-'),
-          startTime: dayjs(`${date} ${time}`).subtract(0, 'minutes').format('HH:mm'),
+          startTime: dayjs(`${date.join('-')} ${time}`).subtract(0, 'minutes').format('HH:mm'),
           endTime: null,
           content: '',
           event: null
         }
-        this.$emit('selected-block:day', { ...this.selectedBlock, event: null, isBooked: false })
+        this.$emit('selected-block:day', { ...this.selectedBlock, isBooked: false })
       }
     },
     isSelectedBlock(events, time) {
