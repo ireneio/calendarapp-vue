@@ -2,16 +2,49 @@
   <div v-if="loading" class="loading">
     <div class="loading__text">
       <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      <div class="title">{{ 'Loading...' }}</div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    invokeOnMount: {
+      required: false,
+      default: true
+    },
+    handleStart: {
+      required: false,
+      default: false
+    },
+    handleFinish: {
+      required: false,
+      default: true
+    }
+  },
   data() {
     return {
       loading: false,
-      delayMs: 800
+      delayMs: 800,
+      isManual: false
+    }
+  },
+  watch: {
+    handleStart: {
+      handler(v) {
+        if (v) {
+          this.start()
+          // this.isManual = true
+        }
+      },
+      immediate: true
+    },
+    handleFinish: {
+      handler() {
+        this.finish()
+      },
+      immediate: false
     }
   },
   methods: {
@@ -19,14 +52,22 @@ export default {
       this.loading = true
     },
     finish() {
-      setTimeout(() => {
+      if (this.isManual) {
         this.loading = false
-      }, this.delayMs)
+        this.isManual = false
+      } else {
+        const tid = setTimeout(() => {
+          this.loading = false
+          clearTimeout(tid)
+        }, this.delayMs)
+      }
     }
   },
   mounted() {
-    this.start()
-    this.finish()
+    if (this.invokeOnMount) {
+      this.start()
+      this.finish()
+    }
   }
 }
 </script>
@@ -42,12 +83,17 @@ export default {
   height: 100%;
   z-index: 100;
   overflow: hidden;
-  background-color: rgba(255, 255, 255, .75);
+  background-color: rgba(255, 255, 255, .66);
   &__text {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+  .title {
+    text-align: center;
+    font-size: 14px;
+    color: #aaa;
   }
 }
 

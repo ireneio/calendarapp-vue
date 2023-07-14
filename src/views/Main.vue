@@ -40,8 +40,8 @@
                   aria-expanded="false"
                 >{{ displayName ? displayName.substring(0, 1) : '-' }}</a>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="margin-top: 8px;">
-                  <a class="dropdown-item" @click="handleShowMyBook(false)">全部預約</a>
-                  <a class="dropdown-item" @click="handleShowMyBook(true)">我的預約</a>
+                  <a v-show="showMyBook" class="dropdown-item" @click="handleShowMyBook(false)">全部預約</a>
+                  <a v-show="!showMyBook" class="dropdown-item" @click="handleShowMyBook(true)">我的預約</a>
                   <a class="dropdown-item" @click="handleLogout">登出</a>
                 </div>
               </div>
@@ -226,6 +226,7 @@
         </div>
       </div>
     </div>
+    <default-loading :invoke-on-mount="false" :handle-start="pageLoading" :handle-finish="!pageLoading"></default-loading>
   </div>
 </template>
 
@@ -240,11 +241,16 @@ import reformatTime from '@/mixins/reformatTime'
 import { sleep } from '@/utils/general'
 import applyTypeList from '@/data/applyTypeList.json'
 import assigneeList from '@/data/assigneeList.json'
+import DefaultLoading from '@/components/DefaultLoading.vue'
 
 export default {
   mixins: [weeksData, checkDateIsToday, reformatTime],
+  components: {
+    DefaultLoading
+  },
   data() {
     return {
+      pageLoading: false,
       timeline: [],
       form: {
         content: '',
@@ -334,6 +340,7 @@ export default {
     ...mapActions(['GET_events', 'UPDATE_events', 'updateLoginStatus']),
     handleShowMyBook(val) {
       this.showMyBook = val
+      window.localStorage.setItem('calendar_show_type', val ? 'my' : 'all')
     },
     async clearForm() {
       await sleep(600)
@@ -499,9 +506,23 @@ export default {
     }
   },
   async created() {
+    this.pageLoading = true
     this.makeTimeline()
-    this.getEvents().then(() => {
+    await this.getEvents().then(() => {
       this.clearForm()
+    })
+  },
+  mounted() {
+    this.$nextTick(() => {
+      const cst = window.localStorage.getItem('calendar_show_type')
+      if (cst) {
+        if (cst === 'my') {
+          this.showMyBook = true
+        } else {
+          this.showMyBook = false
+        }
+      }
+      this.pageLoading = false
     })
   },
   beforeDestroy() {
