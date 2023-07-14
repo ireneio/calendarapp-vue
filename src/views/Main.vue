@@ -1,96 +1,136 @@
 <template>
-  <div>
+  <div class="position-relative">
     <div
-      class="container-xl shadow-sm bg-white position-fixed"
-      style="top:0; left:50%; transform:translateX(-50%); z-index:1000;"
+      class="position-fixed"
+      style="top: 0; left: 0; z-index: 1000; width: 100vw;"
     >
-      <div class="row">
-        <div class="col-24">
-          <div class="d-flex align-items-center mt-3">
-            <h5 v-show="$route.path.includes('week')">預約行事曆</h5>
-            <div
-              v-show="$route.path.includes('day')"
-              class="align-items-center mr-2"
-              :class="{ 'd-flex': $route.path.includes('day')}"
-            >
-              <a href="javascript:;" class="text-dark btn" @click="adjustDay(-1)">
-                <fa icon="arrow-alt-circle-left"></fa>
-              </a>
-              <span>{{ getNowYear + ' / ' + getNowMonth + ' / ' + getNowDay}}</span>
-              <a href="javascript:;" class="text-dark btn" @click="adjustDay(1)">
-                <fa icon="arrow-alt-circle-right"></fa>
-              </a>
-            </div>
-            <a
-              href="javascript:;"
-              class="ml-auto btn btn-secondary text-primary rounded-pill"
-              @click="$router.push({ name: $route.path.includes('week') ? 'day' : 'week' })"
-            >
-              {{ $route.path.includes('week') ?'週檢視' : '日檢視' }}
-              <fa icon="caret-down"></fa>
-            </a>
-
-            <div class="dropdown">
+      <div class="container-xl shadow-sm bg-white">
+        <div class="row">
+          <div class="col-24">
+            <div class="d-flex align-items-center mt-2">
+              <img class="mb-0 mr-2" src="../assets/logo_mobile.png" alt="logo" style="{ width: 48px; height: 48px; object-fit: contain; vertical-align: middle; }" @click="handleExtLink()">
+              <div
+                class="d-flex align-items-center mr-2"
+                >
+                <a href="javascript:;" class="text-dark btn" @click="adjustDay($route.path.includes('day') ? -1 : -7)">
+                  <fa icon="arrow-alt-circle-left" style="font-size: 18px; color: #181818;"></fa>
+                </a>
+                <div class="mb-1" style="color: #181818; font-weight: 500; letter-spacing: 2px;">{{ getNowMonth + '月 ' + getNowYear }}</div>
+                <a href="javascript:;" class="text-dark btn" @click="adjustDay($route.path.includes('day') ? 1 : 7)">
+                  <fa icon="arrow-alt-circle-right" style="font-size: 18px; color: #181818;"></fa>
+                </a>
+              </div>
               <a
-                class="ml-2 btn btn-secondary text-primary rounded-pill"
                 href="javascript:;"
-                role="button"
-                id="dropdownMenuLink"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >{{ displayName[0] }}</a>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                <a class="dropdown-item" href="#" @click="handleLogout">登出</a>
+                class="ml-auto btn btn-secondary text-primary rounded-pill"
+                @click="$router.push({ name: $route.path.includes('week') ? 'day' : 'week' })"
+              >
+                {{ $route.path.includes('week') ? '週檢視' : '日檢視' }}
+                <fa icon="caret-down"></fa>
+              </a>
+              <div class="dropdown">
+                <a
+                  class="ml-2 text-white btn btn-danger rounded-circle pl-3 pr-3 pt-2"
+                  href="javascript:;"
+                  role="button"
+                  id="dropdownMenuLink"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >{{ displayName ? displayName.substring(0, 1) : '-' }}</a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="margin-top: 8px;">
+                  <a v-show="showMyBook" class="dropdown-item" @click="handleShowMyBook(false)">全部預約</a>
+                  <a v-show="!showMyBook" class="dropdown-item" @click="handleShowMyBook(true)">我的預約</a>
+                  <a class="dropdown-item" @click="handleLogout">登出</a>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="row py-2">
-        <div class="col-3 text-center d-flex align-items-center justify-content-center">
+        <div class="row py-2">
+          <div class="col-3 text-center d-flex align-items-center justify-content-center">
+            <button
+              class="bg-secondary text-primary rounded-circle btn"
+              style="font-size: 16px; transform:translateY(5px);"
+              @click="$router.push({ name: 'calendar'})"
+            >
+              <fa :icon="['far', 'calendar']"></fa>
+            </button>
+          </div>
           <button
-            class="bg-secondary text-primary rounded-circle btn"
-            style="font-size: 16px; transform:translateY(5px);"
-            @click="$router.push({ name: 'calendar'})"
+            class="col-3 d-flex flex-column align-items-center btn"
+            v-for="(day,index) of getNowWeek"
+            :key="day.day"
+            :class="{ 'bg-primary rounded': isToday(day) && $route.path.includes('day')}"
+            @click="selectDay(day)"
           >
-            <fa :icon="['far', 'calendar']"></fa>
+            <div
+              :class="{'text-light': isToday(day) && $route.path.includes('day')}"
+            >{{ weeks[index].n.split('(')[0]}}</div>
+            <div
+              :class="{'text-light': isToday(day) && $route.path.includes('day')}"
+            >{{ `(${weeks[index].n.split('(')[1]}`}}</div>
+            <div class="mt-1" style="font-weight: 600;" :class="{'text-light': isToday(day) && $route.path.includes('day')}">{{ day.day }}</div>
           </button>
         </div>
-        <button
-          class="col-3 d-flex flex-column align-items-center btn"
-          v-for="(day,index) of getNowWeek"
-          :key="day.day"
-          :class="{ 'bg-primary rounded': isToday(day) && $route.path.includes('day')}"
-          @click="selectDay(day)"
-        >
-          <span
-            :class="{'text-light': isToday(day) && $route.path.includes('day')}"
-          >{{ weeks[index].n}}</span>
-          <span :class="{'text-light': isToday(day) && $route.path.includes('day')}">{{ day.day }}</span>
-        </button>
+      </div>
+      <div style="background-color: #eeeeee; padding: 12px 8px; display: flex; align-items: center; border-bottom: 1px solid #dddddd;" class="shadow-md">
+        <span style="flex-basis: 48px; flex-shrink: 0;">{{ '人員: ' }}</span>
+        <div style="flex-basis: 140px; flex-grow: 0;">
+          <select
+            class="form-control"
+            id="exampleFormControlSelect1"
+            v-model="form.assignee"
+            :disabled="false"
+          >
+            <!-- <option value>選擇預約人員</option> -->
+            <option v-for="item in assigneeListMap" :disabled="item?.disabled" :key="item?.id" :value="item">{{ item?.name }}</option>
+          </select>
+        </div>
       </div>
     </div>
     <router-view
       :timeline="timeline"
       :week="filterEventsToCurrentWeek()"
       :events="filterEventsToCurrentDay()"
+      @selected-block="handleWeekBlockSelect($event)"
+      @selected-block:day="handleDayBlockSelect($event)"
     ></router-view>
+    <!-- footer -->
+    <div style="color: #bbbbbb; text-align: center; padding: 8px 0; font-size: 12px;">
+      <span>Copyright.</span>
+      <span class="ml-1" style="color: rgba(179, 155, 92, 0.75) !important; cursor: pointer; text-decoration: none;" @click="handleExtLink()">Ires Consulting</span>
+      <span class="ml-1">{{ `2022-${new Date().getFullYear()}. All rights reserved.` }}</span>
+    </div>
+    <!-- action sheet -->
     <div
-      class="container-xl position-fixed bg-white shadow-sm"
-      style="bottom:0; left:50%; transform:translateX(-50%);"
+      class="container-xl position-fixed bg-white shadow-lg"
+      style="{ transition: transform .66s; }"
+      :style="{ bottom: 0, left: '50%', transform: showFooter ? 'translate(-50%, 0%)' : 'translate(-50%, 100%)' }"
     >
+      <span
+        class="position-absolute h3 text-decoration-none text-dark"
+        style="{ top: 12px; right: 12px; z-index: 2; cursor: pointer; }"
+        @click.stop="() => showFooter = false"
+      >&times;</span>
+      <span
+        class="position-absolute"
+        style="{ top: 0; left: 12px; z-index: 2; transform: translateY(8px); text-decoration: none; cursor: pointer; font-size: 12px; color: #aaaaaa; }"
+        @click="adjustDay('now')"
+      >回到當日</span>
       <div class="row">
         <div class="col-24 text-center py-3">
           <button
             type="button"
-            class="btn btn-primary"
+            class="btn btn-link"
             data-target="#addEventModal"
             data-toggle="modal"
-          >新增預約</button>
+            :disabled="!!selectedBlock?.isBooked"
+          >{{ selectedBlock?.isBooked ? '此時段已被預約' : '新增預約' }}</button>
         </div>
       </div>
     </div>
+    <!-- block modal -->
     <div
       class="modal fade"
       id="addEventModal"
@@ -100,9 +140,9 @@
       aria-hidden="true"
     >
       <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="{ transform: translateY(100px); }">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">新增預約</h5>
+            <h5 class="modal-title" id="exampleModalLabel">{{ isFormReadOnly ? '查看' : selectedBlock?.booked?.userId === userId ? '編輯' : '新增' }}預約</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -125,99 +165,243 @@
               </button>
             </div>
             <div class="form-row">
-              <div class="form-group col-24">
-                <label for="exampleFormControlTextarea1">預約內容</label>
-                <textarea
-                  v-model="form.content"
+              <div class="form-group col-24" v-if="this.applyTypeListMap.length">
+                <label for="exampleFormControlSelect1">*項目</label>
+                <select
                   class="form-control"
-                  id="exampleFormControlTextarea1"
-                  rows="3"
-                ></textarea>
+                  id="exampleFormControlSelect1"
+                  v-model="form.applyType"
+                  :disabled="isFormReadOnly"
+                >
+                  <option value>選擇預約項目</option>
+                  <option v-for="item in applyTypeListMap" :disabled="item?.disabled" :key="item?.name" :value="item">{{ item?.name }}</option>
+                </select>
+              </div>
+              <div class="form-group col-24" v-if="this.assigneeListMap.length">
+                <label for="exampleFormControlSelect1">*人員</label>
+                <select
+                  class="form-control"
+                  id="exampleFormControlSelect1"
+                  v-model="form.assignee"
+                  :disabled="isFormReadOnly || !form.assignee.id"
+                >
+                  <!-- <option value>選擇預約人員</option> -->
+                  <option v-for="item in assigneeListMap" :disabled="item?.disabled" :key="item?.id" :value="item">{{ item?.name }}</option>
+                </select>
               </div>
               <div class="form-group col-24">
-                <label for="exampleInputEmail1">日期</label>
+                <label for="exampleInputEmail1">*日期</label>
                 <input
                   v-model="form.date"
                   type="date"
                   class="form-control"
                   id="exampleInputEmail1"
                   aria-describedby="emailHelp"
+                  :readonly="isFormReadOnly"
                 >
               </div>
               <div class="form-group col-12">
-                <label for="exampleFormControlSelect1">開始時間</label>
+                <label for="exampleFormControlSelect1">*開始時間</label>
                 <select
                   class="form-control"
                   id="exampleFormControlSelect1"
                   v-model="form.startTime"
+                  :disabled="isFormReadOnly"
                 >
                   <option value>選擇開始的時間</option>
-                  <option v-for="time in timeline" :key="time" :value="time">{{time}}</option>
+                  <option v-for="time in timelineMapStartTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value">{{ time?.value }}</option>
                 </select>
               </div>
               <div class="form-group col-12">
-                <label for="exampleFormControlSelect2">結束時間</label>
-                <select class="form-control" id="exampleFormControlSelect2" v-model="form.endTime">
+                <label for="exampleFormControlSelect2">*結束時間</label>
+                <select class="form-control" id="exampleFormControlSelect2" v-model="form.endTime" :disabled="disableEndTimeSelect || isFormReadOnly">
                   <option value>選擇結束的時間</option>
-                  <option v-for="time in timeline" :key="time" :value="time">{{time}}</option>
+                  <option v-for="time in timelineMapEndTime" :disabled="time?.disabled" :key="time?.value" :value="time?.value">{{ time?.value }}</option>
                 </select>
+              </div>
+              <div class="form-group col-24">
+                <label for="exampleFormControlTextarea1">備註</label>
+                <textarea
+                  v-model="form.content"
+                  class="form-control"
+                  id="exampleFormControlTextarea1"
+                  rows="3"
+                  :readonly="isFormReadOnly"
+                ></textarea>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+            <button v-if="selectedBlock?.booked?.start && selectedBlock?.booked?.hasEvent && selectedBlock?.booked?.userId === userId" type="button" class="btn btn-danger" data-dismiss="modal" @click="handleDeleteBookedBlock()">{{ '刪除' }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" :disabled="pageLoading" @click="() => {
+              clearForm()
+            }">{{ isFormReadOnly ? '關閉' : '取消' }}</button>
             <button
               type="button"
               class="btn btn-primary"
               @click="handleFormSubmit"
               :data-dismiss="alerts.length > 0 ? '' : 'modal'"
+              v-if="!isFormReadOnly"
             >提交</button>
           </div>
         </div>
       </div>
     </div>
+    <default-loading :invoke-on-mount="false" :handle-start="pageLoading" :handle-finish="!pageLoading"></default-loading>
+    <!-- <snackbar ref="snackbar" baseSize="100px" :wrapClass="''" :colors="null" :holdTime="3000" :multiple="true"/> -->
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions, mapState } from 'vuex'
+import axios from 'axios'
+import dayjs from 'dayjs'
+import _ from 'lodash'
 import weeksData from '@/mixins/weeksData'
 import checkDateIsToday from '@/mixins/checkDateIsToday'
 import reformatTime from '@/mixins/reformatTime'
-import axios from 'axios'
+import { sleep } from '@/utils/general'
+import applyTypeList from '@/data/applyTypeList.json'
+import assigneeList from '@/data/assigneeList.json'
+import DefaultLoading from '@/components/DefaultLoading.vue'
+
 export default {
   mixins: [weeksData, checkDateIsToday, reformatTime],
-  computed: {
-    ...mapGetters(['getNowWeek']),
-    ...mapState(['events', 'displayName'])
+  components: {
+    DefaultLoading
   },
   data() {
     return {
+      pageLoading: false,
       timeline: [],
       form: {
         content: '',
         startTime: '',
         endTime: '',
-        date: ''
+        date: '',
+        applyType: {
+          name: '',
+          length: ''
+        },
+        assignee: {
+          id: '',
+          name: ''
+        }
       },
-      alerts: []
+      alerts: [],
+      brand: process.env.VUE_APP_BRAND,
+      selectedBlock: null,
+      showFooter: false,
+      isFormReadOnly: false,
+      showMyBook: false
+    }
+  },
+  computed: {
+    ...mapGetters(['getNowWeek']),
+    ...mapState(['events', 'displayName', 'userId']),
+    applyTypeListMap() {
+      return applyTypeList.map((v) => {
+        return {
+          ...v
+          // disabled: dayjs(`${this.form.date} ${this.form.startTime}`).add(this.form.applyType.length, 'minutes').format('HH:mm')
+        }
+      })
+    },
+    assigneeListMap() {
+      return assigneeList.filter((v) => v?.group && v?.group === process.env.VUE_APP_ASSIGNEE_GROUP)
+    },
+    timelineMapStartTime() {
+      const events = this.filterEventsToCurrentWeek()
+      const hasEvent = (date, timelineTime) => {
+        const targetDayEvents = events.filter((event) => dayjs(`${event.year}-${event.month}-${event.day}`).isSame(dayjs(date)))
+        if (targetDayEvents.length) {
+          const events = _.flatten(targetDayEvents[0].events)
+          const thisDate = dayjs(`${date} ${timelineTime}`)
+          return events.filter((event) => {
+            const st = dayjs(`${date} ${event?.startTime}`)
+            const et = dayjs(`${date} ${event?.endTime}`)
+            return (st.isSame(thisDate) || st.isBefore(thisDate)) && et.isAfter(thisDate)
+          }).length > 0
+        }
+        return false
+      }
+      return this.timeline.map((timelineTime) => {
+        return {
+          value: timelineTime,
+          disabled: hasEvent(this.form.date, timelineTime) || hasEvent(this.form.date, dayjs(`${this.form.date} ${timelineTime}`).add(this.form.applyType.length, 'minutes').format('HH:mm'))
+        }
+      })
+    },
+    timelineMapEndTime() {
+      // return this.timeline.map((v) => {
+      //   const st = dayjs(`${this.form.date} ${this.form.startTime}`)
+      //   return {
+      //     value: v,
+      //     disabled: this.form.startTime ? st.isAfter(dayjs(`${this.form.date} ${v}`)) || st.isSame(dayjs(`${this.form.date} ${v}`)) : false
+      //   }
+      // })
+      return this.timeline.map((v) => ({ value: v, disabled: true }))
+    },
+    disableEndTimeSelect() {
+      return true
+    }
+  },
+  watch: {
+    // 'form.startTime'(v) {
+    //   this.form.endTime = dayjs(`${this.form.date} ${this.form.startTime}`).add(15, 'minutes').format('HH:mm')
+    // }
+    'form.startTime'(v) {
+      this.form.endTime = dayjs(`${this.form.date} ${this.form.startTime}`).add(this.form.applyType.length, 'minutes').format('HH:mm')
+    },
+    'form.applyType.length'(v) {
+      this.form.endTime = dayjs(`${this.form.date} ${this.form.startTime}`).add(v, 'minutes').format('HH:mm')
+    },
+    'form.assignee.id': {
+      async handler(v) {
+        this.pageLoading = true
+        await this.getEvents()
+        this.clearForm()
+        this.pageLoading = false
+      },
+      immediate: true
     }
   },
   methods: {
     ...mapMutations(['setNowDate']),
     ...mapActions(['GET_events', 'UPDATE_events', 'updateLoginStatus']),
+    async handleShowMyBook(val) {
+      this.pageLoading = true
+      this.showMyBook = val
+      window.localStorage.setItem('calendar_show_type', val ? 'my' : 'all')
+      await sleep(600)
+      this.pageLoading = false
+    },
+    async clearForm() {
+      await sleep(600)
+      // this.form.content = `[${this.displayName}]: 我要預約`
+      this.form.content = ''
+      if (this.applyTypeListMap.length) {
+        this.form.applyType = this.applyTypeListMap[0]
+      }
+      this.selectedBlock = null
+      this.alerts = []
+    },
     // make timeline blocks (every 30 mins)
     makeTimeline() {
-      for (let i = 6; i < 24; i += 0.5) {
+      const startHour = !isNaN(Number(process.env.VUE_APP_BOOK_START_TIME)) ? Number(process.env.VUE_APP_BOOK_START_TIME) : 10
+      const endHour = !isNaN(Number(process.env.VUE_APP_BOOK_END_TIME)) ? Number(process.env.VUE_APP_BOOK_END_TIME) : 21.5
+      for (let i = startHour; i < endHour + 0.5; i += 0.25) {
         const hour = parseInt(i).toString()
-        const min = i % 1 === 0 ? '00' : '30'
-        const zone = parseInt(i) < 12 ? 'am' : 'pm'
-        const str = hour + ':' + min + zone
+        const minStr = String(i)
+        const min = minStr.includes('.25') ? '15' : minStr.includes('.5') ? '30' : minStr.includes('.75') ? '45' : '00'
+        const str = hour + ':' + min
         this.timeline = [...this.timeline, str]
       }
     },
     async getEvents() {
-      await this.GET_events()
+      if (this.form.assignee.id) {
+        await this.GET_events({ ...this.form })
+      }
     },
     filterEventsToCurrentWeek() {
       const filteredEvents = this.events
@@ -235,6 +419,12 @@ export default {
           return { ...weekDay, events: [] }
         }
       })
+      if (this.showMyBook) {
+        return res.map((v) => ({
+          ...v,
+          events: v.events.filter((vv) => vv.userId === this.userId)
+        }))
+      }
       return res
     },
     filterEventsToCurrentDay() {
@@ -243,10 +433,20 @@ export default {
         const date = new Date(event.date)
         if (date.getMonth() + 1 === this.getNowMonth && date.getFullYear() === this.getNowYear && date.getDate() === this.getNowDay) return event
       }) : []
+      if (this.showMyBook) {
+        return res.filter((v) => v.userId === this.userId)
+      }
       return res
     },
-    async handleFormSubmit() {
-      if (this.form.content === '' || this.form.startTime === '' || this.form.endTime === '' || this.form.date === '') {
+    async handleDeleteBookedBlock() {
+      this.handleFormSubmit('delete')
+    },
+    async handleFormSubmit(action) {
+      if (this.pageLoading) {
+        return
+      }
+      // if (this.form.content === '' || this.form.startTime === '' || this.form.endTime === '' || this.form.date === '') {
+      if (this.form.startTime === '' || this.form.endTime === '' || this.form.date === '') {
         if (this.alerts.indexOf('請填入所有欄位') === -1) this.alerts.push('請填入所有欄位')
         return false
       }
@@ -256,49 +456,31 @@ export default {
         if (this.alerts.indexOf('開始時間不得晚於結束時間') === -1) this.alerts.push('開始時間不得晚於結束時間')
         return false
       }
-      const events = this.events
-      // check if block is already booked
-      if (events.length) {
-        events.find(event => {
-          const formDate = new Date(this.form.date)
-          const eventDate = new Date(event.date)
-          if (formDate.getFullYear() === eventDate.getFullYear() && formDate.getMonth() === eventDate.getMonth && formDate.getDate() === eventDate.getDate()) {
-            if (this.reformatTime(event.startTime) <= startTime || this.reformatTime(event.endTime) >= endTime || this.reformatTime(event.endTime) > startTime) {
-              if (this.alerts.indexOf('這個時段已經有預約') === -1) this.alerts.push('這個時段已經有預約')
-              return false
-            }
-          }
-        })
-      }
-      await this.UPDATE_events(this.form)
-      this.form = { content: '', startTime: '', endTime: '', date: '' }
-      this.filterEventsToCurrentWeek()
+      this.pageLoading = true
+      await this.UPDATE_events({ ...this.form, deleted: action === 'delete' })
+      await this.getEvents()
+      // this.$refs.snackbar.warn('msg')
+      // this.$refs.snackbar.open('msg')
+      this.clearForm()
+      this.pageLoading = false
     },
     // change current day with a specific date
     selectDay(date) {
-      if (this.$route.path.includes('week')) return false
       const { day, month, year } = date
       this.setNowDate(`${year}-${month}-${day}`)
-    },
-    // change current day by -1/+1
-    adjustDay(val) {
-      if ((this.getNowDay === this.countDaysInMonth(this.getNowYear, this.getNowMonth) && val === 1) || (this.getNowDay === 1 && val === -1)) {
-        if (val === 1) {
-          if (this.getNowMonth === 12 && this.getNowDay === 31) {
-            this.setNowDate(`${this.getNowYear + 1}-${1}-${1}`)
-          } else {
-            this.setNowDate(`${this.getNowYear}-${this.getNowMonth + 1}-${1}`)
-          }
-        } else {
-          if (this.getNowMonth === 1 && this.getNowDay === 1) {
-            this.setNowDate(`${this.getNowYear - 1}-${12}-${31}`)
-          } else {
-            this.setNowDate(`${this.getNowYear}-${this.getNowMonth - 1}-${this.countDaysInMonth(this.getNowYear, this.getNowMonth - 1)}`)
-          }
-        }
-      } else {
-        this.setNowDate(`${this.getNowYear}-${this.getNowMonth}-${this.getNowDay + val}`)
+      if (this.$route.path.includes('week')) {
+        this.$router.push('/main/day')
       }
+    },
+    // change current day by [val]
+    adjustDay(val) {
+      if (val === 'now') {
+        this.setNowDate(dayjs().format('YYYY-MM-DD'))
+        return
+      }
+      const target = dayjs(`${this.getNowYear}-${this.getNowMonth}-${this.getNowDay}`)
+      const add = target.add(val, 'days')
+      this.setNowDate(add.format('YYYY-MM-DD'))
     },
     // count total days in a specific month
     countDaysInMonth(year, month) {
@@ -310,18 +492,90 @@ export default {
             : 28
           : 31
     },
-    handleLogout() {
+    async handleLogout() {
+      this.pageLoading = true
       const accessToken = localStorage.getItem('token')
-      axios.post(`${process.env.VUE_APP_API_URL}/users/revoke`, { accessToken })
+      await axios.post(`${process.env.VUE_APP_API_URL}/users/revoke`, { accessToken })
         .then(() => {
           this.updateLoginStatus({ status: false, accessToken: '', userId: null, displayName: null })
           this.$router.push({ name: 'Home' })
         })
+      this.pageLoading = false
+    },
+    async handleWeekBlockSelect(block) {
+      // console.log('block', block)
+      this.selectedBlock = { ...block }
+      this.form.date = dayjs(`${block?.year}/${block?.month}/${block?.day}`).format('YYYY-MM-DD')
+      if (block?.isBooked) {
+        this.form.content = block?.event?.content
+      } else {
+        this.form.content = '-'
+      }
+      const find = this.timelineMapStartTime.find((v) => v.value === block?.time)
+      if (block?.event?.startTime === block?.time && block?.isBooked && !find.disabled) {
+        this.form.startTime = dayjs(`${block?.year}/${block?.month}/${block?.day} ${block?.time}`).subtract(0, 'minutes').format('HH:mm')
+      } else if (block?.event && block?.isBooked && !find.disabled) {
+        this.form.startTime = dayjs(`${block?.year}/${block?.month}/${block?.day} ${block?.event?.startTime}`).subtract(0, 'minutes').format('HH:mm')
+      } else if (!find.disabled) {
+        this.form.startTime = dayjs(`${block?.year}/${block?.month}/${block?.day} ${block?.time}`).subtract(0, 'minutes').format('HH:mm')
+      } else {
+        this.form.startTime = ''
+      }
+      if (block?.event !== null && block?.event?.userId === this.userId && block?.event?.startTime === block?.time && block?.isBooked) {
+        this.isFormReadOnly = false
+      } else if (block?.isBooked) {
+        this.isFormReadOnly = true
+      } else {
+        this.isFormReadOnly = false
+      }
+      await sleep(300)
+      this.showFooter = true
+    },
+    async handleDayBlockSelect(block) {
+      // console.log(block)
+      this.selectedBlock = { ...block }
+      this.form.date = block?.date
+      this.form.startTime = block?.startTime
+      // this.form.endTime = dayjs(`${block?.date} ${block?.startTime}`).add(this.form.applyType.length, 'minutes').format('HH:mm')
+      this.form.content = block?.content
+      if (block?.isBooked) {
+        this.isFormReadOnly = true
+      } else {
+        this.isFormReadOnly = false
+        await sleep(300)
+        this.showFooter = true
+      }
+    },
+    handleExtLink() {
+      window.open('https://iresconsulting.com/', '_blank')
     }
   },
   created() {
+    this.pageLoading = true
     this.makeTimeline()
-    this.getEvents()
+  },
+  mounted() {
+    this.$nextTick(async () => {
+      const cst = window.localStorage.getItem('calendar_show_type')
+      if (cst) {
+        if (cst === 'my') {
+          this.showMyBook = true
+        } else {
+          this.showMyBook = false
+        }
+      }
+      // init default assignee
+      if (this.assigneeListMap.length) {
+        console.log('this.assigneeListMap', this.assigneeListMap)
+        this.form.assignee = this.assigneeListMap[0]
+        await this.getEvents().then(() => {
+          this.clearForm()
+        })
+      } else {
+        this.form.assignee = { id: '', name: '' }
+      }
+      this.pageLoading = false
+    })
   },
   beforeDestroy() {
     // force calender to render current month at top
@@ -329,6 +583,3 @@ export default {
   }
 }
 </script>
-
-<style>
-</style>

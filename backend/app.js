@@ -4,11 +4,15 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const mongoose = require('mongoose')
+const cors = require('cors')
 const env = require('dotenv').config().parsed
 const usersRouter = require('./routes/users')
 const eventsRouter = require('./routes/events')
 
 const app = express()
+
+console.log('[env] MONGO_URI: ', process.env.MONGO_URI);
+console.log('[env] REDIRECT_URL: ', process.env.REDIRECT_URL);
 
 // connect DB
 ;(async function() {
@@ -24,6 +28,7 @@ const app = express()
   }
 })()
 
+app.use(cors())
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -31,21 +36,22 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 // cors
-app.use(function(req, res, next) {
-  res.header({ 'Access-Control-Allow-Origin': env.CORS_URL })
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  )
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  next()
-})
+// app.use(function(req, res, next) {
+//   res.header({ 'Access-Control-Allow-Origin': env.CORS_URL })
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept'
+//   )
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+//   next()
+// })
 
 app.use('/users', usersRouter)
 app.use('/events', eventsRouter)
 
 app.use('/', function(req, res, next) {
-  res.send('Server Running')
+  res.status(401)
+  res.send('<div></div>')
 })
 
 // catch 404 and forward to error handler
@@ -61,7 +67,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500)
-  res.render('error')
+  res.send('error')
 })
 
 module.exports = app

@@ -1,9 +1,6 @@
-import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '@/store/'
 import axios from 'axios'
-
-Vue.use(VueRouter)
 
 const routes = [
   {
@@ -46,10 +43,13 @@ const routes = [
 ]
 
 const router = new VueRouter({
+  mode: 'history',
   routes
 })
 
 router.beforeEach((to, from, next) => {
+  document.title = to.meta.title || `${process.env.BRAND || 'Ires'} 行事曆`
+
   const token = localStorage.getItem('token')
   if (to.name === 'Home') {
     if (store.state.isLoggedIn) next(false)
@@ -94,4 +94,5 @@ router.beforeEach((to, from, next) => {
       })
   }
 })
+
 export default router

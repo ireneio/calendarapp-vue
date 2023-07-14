@@ -17,7 +17,7 @@ const updateUserStatus = (...args) => {
 }
 
 const updateUserEvents = (...args) => {
-  return User.update({ _id: args[0] }, { $push: { events: args[1] } })
+  return User.updateOne({ _id: args[0] }, { $push: { events: args[1] } })
 }
 
 module.exports = {

@@ -1,10 +1,14 @@
 {
-  "name": "calenderapp-ohbot",
+  "name": "calender-ires",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "^16.19"
+  },
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "start": "node startup.js; serve -s dist -l tcp://0.0.0.0:${PORT:-8080} -n",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -15,10 +19,14 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
     "core-js": "^3.6.5",
+    "dayjs": "^1.11.9",
     "jquery": "^3.5.1",
+    "lodash": "^4.17.21",
     "popper.js": "^1.16.1",
+    "serve": "^11.3.2",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
+    "vuejs-snackbar": "^4.0.1",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
@@ -35,7 +43,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.2.2",
-    "node-sass": "^4.12.0",
+    "sass": "^1.49.9",
     "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.11"
   }
