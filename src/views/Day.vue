@@ -71,7 +71,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['userId']),
+    ...mapState(['userId', 'now']),
     ...mapGetters(['getNowDay'])
   },
   methods: {
@@ -88,7 +88,7 @@ export default {
       if (!events.length) {
         return
       }
-      const date = this.getNowDay.split('-')
+      const date = new Date(this.now).toLocaleDateString('se').replace(/\D/g, '').split('-')
       const currentBlockEvents = this.getCurrentBlockEvents({
         time,
         year: date[0],
