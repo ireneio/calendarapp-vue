@@ -23,8 +23,8 @@
               <a
                 href="javascript:;"
                 class="ml-auto btn btn-secondary text-primary rounded-pill"
-                @click="$router.push({ name: $route.path.includes('week') ? 'day' : 'week' })"
-              >
+                >
+                <!-- @click="$router.push({ name: $route.path.includes('week') ? 'day' : 'week' })" -->
                 {{ $route.path.includes('week') ? '週檢視' : '日檢視' }}
                 <fa icon="caret-down"></fa>
               </a>
@@ -74,7 +74,7 @@
           </button>
         </div>
       </div>
-      <div style="background-color: #eeeeee; padding: 12px 8px; display: flex; align-items: center; border-bottom: 1px solid #dddddd;" class="shadow-md">
+      <div style="background-color: #eeeeee; padding: 12px 8px; display: flex; align-items: center; border-bottom: 1px solid #dddddd; width: 100%;" class="shadow-md">
         <span style="flex-basis: 48px; flex-shrink: 0;">{{ '人員: ' }}</span>
         <div style="flex-basis: 140px; flex-grow: 0;">
           <select
