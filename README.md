@@ -24,8 +24,6 @@
 - Eslint Standard
 
 ## TODO
-
-- 無限下滑的月曆選單, 目前是全部顯示所以 load 很久
 - refactor components into more details
 
 ## Project setup
