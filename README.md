@@ -12,7 +12,7 @@
 - SPA
 - 前端：Vue/Vue Router/Vuex, Bootstrap 4
 - 後端：NodeJS, Express, MongoDB
-- API Server: https://glacial-fortress-89595.herokuapp.com/
+- API Server:
 
 ### 套件
 
