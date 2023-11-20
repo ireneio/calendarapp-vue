@@ -21,30 +21,26 @@
 ## TODO
 - refactor components into more details
 
-## Project setup
-
-```
-npm install
-```
-
 ### Compiles and hot-reloads for development
 
 ```
-npm run dev
+yarn
+yarn dev
 ```
 
 ### Compiles and minifies for production
 
 ```
-npm run build
+yarn
+yarn build
 ```
 
-### Lints and fixes files
+### Backend
 
 ```
-npm run lint
+cd backend
+npm start
 ```
-
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
+```
+url: http://localhost:3000
+```
