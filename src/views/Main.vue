@@ -576,7 +576,6 @@ export default {
       }
       // init default assignee
       if (this.assigneeListMap.length) {
-        console.log('this.assigneeListMap', this.assigneeListMap)
         this.form.assignee = this.assigneeListMap[0]
         await this.getEvents().then(() => {
           this.clearForm()
