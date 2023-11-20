@@ -5,6 +5,7 @@
     <img
       v-show="!pLdn"
       class="btn btn-lg btn-block"
+      style="width: 70vw; aspect-ratio: video;"
       :src="btnSrc"
       @mouseover="handleBgChange(1)"
       @mouseleave="handleBgChange(-1)"
