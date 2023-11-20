@@ -75,8 +75,8 @@
         </div>
       </div>
       <div class="row">
-        <div style="background-color: #eeeeee; padding: 12px 8px; display: flex; align-items: center; border-bottom: 1px solid #dddddd;" class="col shadow-md">
-          <span style="flex-basis: 48px; flex-shrink: 0;">{{ '人員: ' }}</span>
+        <div style="background-color: #eeeeee; display: flex; align-items: center; border-bottom: 1px solid #dddddd;" class="col shadow-md">
+          <span style="flex-basis: 48px; flex-shrink: 0; margin-left: 12px;">{{ '人員: ' }}</span>
           <div style="flex-basis: 140px; flex-grow: 0;">
             <select
               class="form-control"
