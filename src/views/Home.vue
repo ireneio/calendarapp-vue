@@ -1,7 +1,7 @@
 <template>
   <form class="form-signin d-flex flex-column align-items-center justify-content-center">
     <img class="mb-2" src="../assets/logo.png" alt="logo" style="{ width: 240px; height: 240px; object-fit: contain; vertical-align: middle; }">
-    <h1 class="h4 mb-3 font-weight-bold text-center">我要預約 {{ brand }}</h1>
+    <h1 class="h4 mb-3 font-weight-bold text-center">{{ brand }} 預約表單系統</h1>
     <img
       v-show="!pLdn"
       class="btn btn-lg btn-block"
