@@ -476,8 +476,16 @@ export default {
     },
     // change current day by [val]
     adjustDay(val) {
+      const now = dayjs()
+      const calculatedValue = val > 0 ? now.add(val, 'days') : now.subtract(val, 'days')
+      const beforeMinDate = calculatedValue.isBefore(now.startOf('month'))
+      const afterMaxDate = calculatedValue.isAfter(now.add(1, 'month').endOf('month'))
+      if (beforeMinDate || afterMaxDate) {
+        window.alert('不允許訪問的日期區間!')
+        return
+      }
       if (val === 'now') {
-        this.setNowDate(dayjs().format('YYYY-MM-DD'))
+        this.setNowDate(now.format('YYYY-MM-DD'))
         return
       }
       const target = dayjs(`${this.getNowYear}-${this.getNowMonth}-${this.getNowDay}`)
