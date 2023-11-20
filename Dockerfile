@@ -9,7 +9,7 @@ ENV VUE_APP_BRAND=Ires
 ENV VUE_APP_BOOK_START_TIME=10
 ENV VUE_APP_BOOK_END_TIME=21.5
 
-RUN npm install -g yarn && yarn && yarn build
+RUN yarn && yarn build
 
 EXPOSE 8080
 
