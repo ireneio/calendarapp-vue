@@ -48,7 +48,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || `${process.env.BRAND || 'Ires'} 行事曆`
+  document.title = to.meta.title || `${process.env.BRAND || 'Ires'} 預約表單系統`
 
   const token = localStorage.getItem('token')
   if (to.name === 'Home') {
