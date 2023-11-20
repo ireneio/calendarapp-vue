@@ -7,12 +7,11 @@
 - 供萬年曆直接選擇日期
 - 新增預約事件
 
-## 使用技術
+## 架構
 
 - SPA
-- 前端：Vue/Vue Router/Vuex, Bootstrap 4
+- 前端：Vue2, Bootstrap 4
 - 後端：NodeJS, Express, MongoDB
-- API Server:
 
 ### 套件
 
