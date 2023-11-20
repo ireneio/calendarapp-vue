@@ -10,12 +10,8 @@
 ## 架構
 
 - SPA
-- 前端：Vue2, Bootstrap 4
+- 前端：Vue2, Bootstrap4
 - 後端：NodeJS, Express, MongoDB
-
-### 套件
-
-- axios
 
 ### 工具
 
